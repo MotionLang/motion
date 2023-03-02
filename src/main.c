@@ -1,17 +1,17 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/common.h"
-#include "include/chunk.h"
-#include "include/debug.h"
-#include "include/memory.h"
-#include "include/vm.h"
+#include "/workspaces/motion/include/common.h"
+#include "/workspaces/motion/include/chunk.h"
+#include "/workspaces/motion/include/debug.h"
+#include "/workspaces/motion/include/memory.h"
+#include "/workspaces/motion/include/vm.h"
 
 static void repl() {
     char line[1024];
     for (;;) {
-        printf("north $: ");
+        printf("Motion $: ");
 
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");
@@ -69,7 +69,7 @@ int main(int argc, const char* argv[]) {
     } else if (argc == 2) {
         runFile(argv[1]);
     } else {
-        fprintf(stderr, "Err: InvalidPathErr")
+        fprintf(stderr, "Err: InvalidPathErr");
     }
 
     freeVM();

@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-#include "include/common.h"
-#include "include/debug.h"
-#include "include/vm.h"
-#include "include/memory.h"
-#include "include/compiler.h"
+#include "/workspaces/motion/include/common.h"
+#include "/workspaces/motion/include/debug.h"
+#include "/workspaces/motion/include/vm.h"
+#include "/workspaces/motion/include/memory.h"
+#include "/workspaces/motion/include/compiler.h"
 
 VM vm;
 
