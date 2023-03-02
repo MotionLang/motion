@@ -148,7 +148,7 @@ static void binary() {
 
 static void grouping() {
     expression();
-    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expr.");
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after expr.");
 }
 
 static void number() {
@@ -215,7 +215,7 @@ static void parsePrecedence(Precedence precedence) {
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
     if (prefixRule == NULL) {
-        error("Expect Expr");
+        error("Expected Expression");
         return;
     }
 
@@ -245,7 +245,7 @@ bool compile(const char* source, Chunk* chunk) {
 
     advance();
     expression();
-    consume(TOKEN_EOF, "Expect End of Expression");
+    consume(TOKEN_EOF, "Expected End of Expression");
     endCompiler();
     return !parser.hadError;
 }
