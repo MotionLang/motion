@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "include/memory.h"
-#include "include/value.h"
+#include "/workspaces/motion/include/memory.h"
+#include "/workspaces/motion/include/value.h"
 
 void initValueArray(ValueArray* array) {
     array->values = NULL;

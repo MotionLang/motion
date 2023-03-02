@@ -1,8 +1,8 @@
 #ifndef clox_vm_h
 #define clox_vm_h
 
-#include "/workspaces/codespaces-blank/include/chunk.h"
-#include "/workspaces/codespaces-blank/include/value.h"
+#include "/workspaces/motion/include/chunk.h"
+#include "/workspaces/motion/include/value.h"
 
 #define STACK_MAX 256
 

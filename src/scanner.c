@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "include/common.h"
-#include "include/scanner.h"
+#include "/workspaces/motion/include/common.h"
+#include "/workspaces/motion/include/scanner.h"
 
 typedef struct {
     const char* start;
@@ -172,7 +172,7 @@ static Token string() {
 
     //Closing quote
     advance();
-    return makeToken(TOKEN_STRING0);
+    return makeToken(TOKEN_STRING);
 }
 
 Token scanToken() {

@@ -5,6 +5,9 @@
         "common.h": "c",
         "memory.h": "c",
         "vm.h": "c",
-        "value.h": "c"
+        "value.h": "c",
+        "compiler.h": "c",
+        "debug.h": "c",
+        "scanner.h": "c"
     }
 }

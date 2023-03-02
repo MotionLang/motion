@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "include/common.h"
-#include "include/compiler.h"
-#include "include/scanner.h"
-#include "include/chunk.h"
+#include "/workspaces/motion/include/common.h"
+#include "/workspaces/motion/include/compiler.h"
+#include "/workspaces/motion/include/scanner.h"
+#include "/workspaces/motion/include/chunk.h"
+
+#ifdef DEBUG_PRINT_CODE
+#include "/workspaces/motion/include/debug.h"
+#endif
 
 typedef struct {
     Token current;
@@ -117,6 +121,11 @@ static void emitConstant(Value value) {
 
 static void endCompiler() {
     emitReturn();
+    #ifdef DEBUG_PRINT_CODE
+        if (!parser.hadError) {
+            disassembleChunk(currentChunk(), "code");
+        }
+    #endif
 }
 
 static void expression();
@@ -237,6 +246,6 @@ bool compile(const char* source, Chunk* chunk) {
     advance();
     expression();
     consume(TOKEN_EOF, "Expect End of Expression");
-    endCompile();
+    endCompiler();
     return !parser.hadError;
 }
