@@ -1,0 +1,9 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "chunk.h": "c",
+        "common.h": "c",
+        "memory.h": "c",
+        "vm.h": "c"
+    }
+}
