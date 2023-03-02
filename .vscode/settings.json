@@ -4,6 +4,7 @@
         "chunk.h": "c",
         "common.h": "c",
         "memory.h": "c",
-        "vm.h": "c"
+        "vm.h": "c",
+        "value.h": "c"
     }
 }
