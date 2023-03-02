@@ -2,6 +2,8 @@
 
 Motion is a dynamically typed general purpose programming language.
 
+Motion is created in pure C, with no dependancies.
+
 Motion is a variation of the Lox language found at www.craftinginterpreters.com.
 
 ## Contribution:
