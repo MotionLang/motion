@@ -7,6 +7,8 @@ Motion is created in pure C, with no dependancies.
 
 Motion is a variation of the Lox language found at www.craftinginterpreters.com.
 
+Motion is licensed under GNU GPL v3.0.
+
 ## Contribution:
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
 Otherwise, support of any kind is welcome!
