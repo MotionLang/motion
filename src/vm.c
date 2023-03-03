@@ -60,7 +60,7 @@ stack without popping. */
 I reverted back to a stack limit. sad.
 At least this works now. I think.*/
 static Value peek(int distance) {
-    return vm.stackTop[-1 - distance]
+    return vm.stackTop[-1 - distance];
 }
 
 static InterpretResult run() {
