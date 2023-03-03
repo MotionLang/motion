@@ -35,7 +35,7 @@ static char* readFile(const char* path) {
     rewind(file);
 
     char* buffer = (char*)malloc(fileSize + 1);
-    if ((buffer) = NULL) {
+    if ((buffer = NULL)) {
         fprintf(stderr, "Err: OutOfMemoryErr | File: \"%s\".\n", path);
         exit(74);
     }

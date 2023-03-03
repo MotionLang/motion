@@ -7,12 +7,12 @@
 #define STACK_MAX 256
 
 
-//stackTop becomes stackCount, an int
+//stackTop became stackCount, an int
 typedef struct {
     Chunk* chunk;
     uint8_t* ip;
     Value* stack[STACK_MAX];
-    int stackTop;
+    Value* stackTop;
 } VM;
 
 typedef enum {
