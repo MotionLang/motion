@@ -11,6 +11,16 @@ Motion is a variation of the Lox language found at www.craftinginterpreters.com.
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
 Otherwise, support of any kind is welcome!
 
+## Features:
+Motion supports (or will support):
+* Dynamic Typing
+* First Class Functions & Closures
+* Classes
+* Automatic Memory Management with Garbage Collection
+* Logical & Arithmetic Operators
+* While Loops
+* And more! (hopefully)
+
 ## Compiling:
 If you want to compile, first clone the repo.
 
