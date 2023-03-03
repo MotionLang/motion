@@ -1,7 +1,7 @@
 # Motion 
 
 
-Motion is a dynamically typed general purpose programming language with a familar syntax.
+Motion is a dynamically typed general purpose programming language with a familar, yet distinct syntax.
 
 Motion is created in pure C, with no dependancies.
 
