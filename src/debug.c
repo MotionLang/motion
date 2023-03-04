@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "/workspaces/motion/include/debug.h"
-#include "/workspaces/motion/include/value.h"
+#include "/workspaces/motionLang/include/debug.h"
+#include "/workspaces/motionLang/include/value.h"
 
 void disassembleChunk(Chunk* chunk, const char* name) {
     printf("== %s ==\n", name);

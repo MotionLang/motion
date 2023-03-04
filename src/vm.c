@@ -30,12 +30,12 @@ static void runtimeError(const char* format, ...) {
 }
 
 void initVM() {
-
     resetStack();
+    vm.objects = NULL;
 }
 
 void freeVM() {
-    
+    freeObjects();
 }
 
 void push(Value value) {
@@ -76,9 +76,9 @@ static void concatenate() {
 
     int length = a->length + b->length;
     char* chars = ALLOCATE(char, length + 1);
-    memcpy(chars, a->chars, a->length)
+    memcpy(chars, a->chars, a->length);
     memcpy(chars + a->length, b->chars, b->length);
-    chars[length] '\0';
+    chars[length]; '\0';
 
     ObjString* result = takeString(chars, length);
     push(OBJ_VAL(result));
@@ -136,7 +136,7 @@ static InterpretResult run() {
                         concatenate();
                     } else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))) {
                         double b = AS_NUMBER(pop());
-                        double a = AS_NUMBER(pop()):
+                        double a = AS_NUMBER(pop());
                         push(NUMBER_VAL(a + b));
                     } else {
                         runtimeError("InvalidOperandErr: Operands must be two numbers or two strings");

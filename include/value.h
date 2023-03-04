@@ -1,7 +1,7 @@
 #ifndef clox_value_h
 #define clox_value_h
 
-#include "/workspaces/motion/include/common.h"
+#include "/workspaces/motionLang/include/common.h"
 
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;
@@ -9,7 +9,7 @@ typedef struct ObjString ObjString;
 typedef enum {
     VAL_BOOL,
     VAL_NIL,
-    VAL_NUMBER
+    VAL_NUMBER,
     VAL_OBJ,
 } ValueType;
 

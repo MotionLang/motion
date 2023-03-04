@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "/workspaces/motion/include/common.h"
-#include "/workspaces/motion/include/chunk.h"
-#include "/workspaces/motion/include/debug.h"
-#include "/workspaces/motion/include/memory.h"
-#include "/workspaces/motion/include/vm.h"
+#include "/workspaces/motionLang/include/common.h"
+#include "/workspaces/motionLang/include/chunk.h"
+#include "/workspaces/motionLang/include/debug.h"
+#include "/workspaces/motionLang/include/memory.h"
+#include "/workspaces/motionLang/include/vm.h"
 
 static void repl() {
     char line[1024];
