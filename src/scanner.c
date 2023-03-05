@@ -204,5 +204,5 @@ Token scanToken() {
         case '"': return string();
     }
     
-    return errorToken("Err: BadCharErr");
+    return errorToken("BadCharErr");
 }
