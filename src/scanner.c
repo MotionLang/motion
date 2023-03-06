@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "/workspaces/motion/include/common.h"
-#include "/workspaces/motion/include/scanner.h"
+#include "/workspaces/motionLang/include/common.h"
+#include "/workspaces/motionLang/include/scanner.h"
 
 typedef struct {
     const char* start;
@@ -204,5 +204,5 @@ Token scanToken() {
         case '"': return string();
     }
     
-    return errorToken("Err: BadCharErr");
+    return errorToken("BadCharErr");
 }

@@ -1,5 +1,5 @@
-#include "/workspaces/motion/include/chunk.h"
-#include "/workspaces/motion/include/memory.h"
+#include "/workspaces/motionLang/include/chunk.h"
+#include "/workspaces/motionLang/include/memory.h"
 
 #include <stdlib.h>
 
