@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// Debugging commands
 #define DEBUG_PRINT_CODE
 #define DEBUG_TRACE_EXECUTION
 

@@ -11,7 +11,7 @@
 static void repl() {
     char line[1024];
     for (;;) {
-        printf("Motion $: ");
+        printf("Motion $ ");
 
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");

@@ -1,8 +1,9 @@
+#include "/workspaces/motionLang/include/object.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/object.h"
 #include "/workspaces/motionLang/include/table.h"
 #include "/workspaces/motionLang/include/value.h"
 #include "/workspaces/motionLang/include/vm.h"
@@ -17,7 +18,7 @@ static Obj* allocateObject(size_t size, ObjType type) {
     object->next = vm.objects;
     vm.objects = object;
     return object;
-} 
+}
 
 static ObjString* allocateString(char* chars, int length, uint32_t hash) {
     ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
@@ -39,23 +40,22 @@ static uint32_t hashString(const char* key, int length) {
 
 ObjString* takeString(char* chars, int length) {
     uint32_t hash = hashString(chars, length);
-    ObjString* interned = tableFindString(&vm.strings, chars, length, 
-                                            hash);
+    ObjString* interned = tableFindString(&vm.strings, chars, length, hash);
 
     if (interned != NULL) {
         FREE_ARRAY(char, chars, length + 1);
         return interned;
     }
-    
+
     return allocateString(chars, length, hash);
 }
 
 ObjString* copyString(const char* chars, int length) {
     uint32_t hash = hashString(chars, length);
-    ObjString* interned = tableFindString(&vm.strings, chars, length, 
-                                            hash);
-    
-    if (interned != NULL) return interned;
+    ObjString* interned = tableFindString(&vm.strings, chars, length, hash);
+
+    if (interned != NULL)
+        return interned;
 
     char* heapChars = ALLOCATE(char, length + 1);
     memcpy(heapChars, chars, length);
@@ -66,7 +66,7 @@ ObjString* copyString(const char* chars, int length) {
 void printObject(Value value) {
     switch (OBJ_TYPE(value)) {
         case OBJ_STRING:
-            printf("%s", AS_CSTRING(value));
+            a printf("%s", AS_CSTRING(value));
             break;
     }
 }
