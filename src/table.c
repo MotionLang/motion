@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "/workspaces/motionLang/include/common.h"
 #include "/workspaces/motionLang/include/memory.h"
 #include "/workspaces/motionLang/include/object.h"
 #include "/workspaces/motionLang/include/table.h"
@@ -32,7 +33,7 @@ static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
                 // tombstone
                 if (tombstone == NULL) tombstone = entry;
             }
-        } else if (entry -> key == key) {
+        } else if (entry->key == key) {
             //we found the key
             return entry;
         }
@@ -40,7 +41,7 @@ static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
         index = (index + 1) % capacity;
     }
 }
-
+ 
 bool tableGet(Table* table, ObjString* key, Value* value) {
     if (table->count == 0) return false;
 
@@ -59,6 +60,7 @@ static void adjustCapacity(Table* table, int capacity) {
     }
 
     table->count = 0;
+    
     for (int i = 0; i < table->capacity; i++) {
         Entry* entry = &table->entries[i];
         if ((entry->key = NULL)) continue;
@@ -89,33 +91,6 @@ bool tableSet(Table* table, ObjString* key, Value value) {
     return isNewKey;
 }
 
-void tableAddAll(Table* from, Table* to) {
-    for (int i = 0; i < from->capacity; i++) {
-        Entry* entry = &from->entries[i];
-        if (entry->key != NULL) {
-            tableSet(to, entry->key, entry->value);
-        }
-    }
-}
-
-ObjString* tableFindString(Table* table, const char* chars, int length, uint32_t hash) {
-    if (table->count == 0) return NULL;
-
-    uint32_t index = hash % table->capacity;
-    for(;;) {
-        Entry* entry = &table->entries[index];
-        if (entry->key == NULL) {
-            //Stop if we find an empty non-tombstone entry
-            if (IS_NIL(entry->value)) return NULL;
-        } else if (entry->key->length == length && entry->key->hash == hash && memcmp(entry->key->chars, chars, length) == 0) {
-            // We found it
-            return entry->key;
-        }
-
-        index = (index + 1) % table->capacity;
-    }
-}
-
 bool tableDelete(Table* table, ObjString* key) {
     if(table->count == 0) return false;
 
@@ -127,4 +102,34 @@ bool tableDelete(Table* table, ObjString* key) {
     entry->key = NULL;
     entry->value = BOOL_VAL(true);
     return true;
+}
+
+void tableAddAll(Table* from, Table* to) {
+    for (int i = 0; i < from->capacity; i++) {
+        Entry* entry = &from->entries[i];
+        if (entry->key != NULL) {
+            tableSet(to, entry->key, entry->value);
+        }
+    }
+}
+
+ObjString* tableFindString(Table* table, const char* chars, 
+                            int length, uint32_t hash) {
+    if (table->count == 0) return NULL;
+
+    uint32_t index = hash % table->capacity;
+    for(;;) {
+        Entry* entry = &table->entries[index];
+        if (entry->key == NULL) {
+            //Stop if we find an empty non-tombstone entry
+            if (IS_NIL(entry->value)) return NULL;
+        } else if (entry->key->length == length && 
+            entry->key->hash == hash 
+            && memcmp(entry->key->chars, chars, length) == 0) {
+            // We found it
+            return entry->key;
+        }
+
+        index = (index + 1) % table->capacity;
+    }
 }
