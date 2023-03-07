@@ -23,16 +23,15 @@ func: myFunc(a, b) {
    }
 }
 
-test: (x > y){
-  returns: (true) {
-    myFunc(y, x);
-  }
-  otherwise: {
+if: (x > y) {
+  myFunc(y, x);
+  } else: {
     myFunc(x, y);
   }
 }
 
 ```
+For more examples, see ```/examples```
 
 ## Contribution:
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
