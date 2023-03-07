@@ -9,6 +9,31 @@ Motion is a variation of the Lox language found at www.craftinginterpreters.com.
 
 Motion is licensed under GNU GPL v3.0.
 
+## Syntax:
+Motion's syntax aspires to be fresh, readable, and clean.
+
+```
+var: x = 10;
+var: y = 5;
+## Comments are cool.
+
+func: myFunc(a, b) {
+  while: (a < b) {
+    a + 1;
+   }
+}
+
+test: (x > y){
+  returns: (true) {
+    myFunc(y, x);
+  }
+  otherwise: {
+    myFunc(x, y);
+  }
+}
+
+```
+
 ## Contribution:
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
 Otherwise, support of any kind is welcome!
