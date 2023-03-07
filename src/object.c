@@ -66,7 +66,7 @@ ObjString* copyString(const char* chars, int length) {
 void printObject(Value value) {
     switch (OBJ_TYPE(value)) {
         case OBJ_STRING:
-            a printf("%s", AS_CSTRING(value));
+            printf("%s", AS_CSTRING(value));
             break;
     }
 }
