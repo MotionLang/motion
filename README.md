@@ -58,7 +58,7 @@ Alternatively, in vscode, use the ```tasks.json``` file found in ```./vscode```.
 
 After compilation, run 
 ```
-./output
+build/output
 ```
 in a terminal.
 
