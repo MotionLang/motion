@@ -3,6 +3,7 @@
 
 #include "/workspaces/motionLang/include/common.h"
 #include "/workspaces/motionLang/include/object.h"
+#include "/workspaces/motionLang/include/value.h"
 
 typedef struct {
     ObjString* key;
