@@ -13,11 +13,13 @@ void initTable(Table* table) {
     table->count = 0;
     table->capacity = 0;
     table->entries = NULL;
+
 }
 
 void freeTable(Table* table) {
     FREE_ARRAY(Entry, table->entries, table->capacity);
     initTable(table);
+
 }
 
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
@@ -121,7 +123,7 @@ ObjString* tableFindString(Table* table, const char* chars,
     for(;;) {
         Entry* entry = &table->entries[index];
         if (entry->key == NULL) {
-            //Stop if we find an empty non-tombstone entry
+            //Stop if we find an empty non- entrytombstone
             if (IS_NIL(entry->value)) return NULL;
         } else if (entry->key->length == length && 
             entry->key->hash == hash 
