@@ -11,7 +11,8 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 
     void* result = realloc(pointer, newSize);
     // Null Case Handling.
-    if (result == NULL) exit(1);
+    if (result == NULL)
+        exit(1);
     return result;
 }
 
@@ -29,7 +30,7 @@ static void freeObject(Obj* object) {
 void freeObjects() {
     Obj* object = vm.objects;
     while (object != NULL) {
-        Obj* next = object ->next;
+        Obj* next = object->next;
         freeObject(object);
         object = next;
     }
