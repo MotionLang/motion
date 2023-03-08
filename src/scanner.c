@@ -1,8 +1,9 @@
+#include "/workspaces/motionLang/include/scanner.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/scanner.h"
 
 typedef struct {
     const char* start;
@@ -22,34 +23,25 @@ static bool isAlpha(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-static bool isDigit(char c) {
-    return c >= '0' && c <= '9';
-}
+static bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
-static bool isAtEnd() {
-    return *scanner.current == '\0';
-}
+static bool isAtEnd() { return *scanner.current == '\0'; }
 
 static char advance() {
     scanner.current++;
     return scanner.current[-1];
 }
 
-static char peek() {
-    return *scanner.current;
-}
+static char peek() { return *scanner.current; }
 
 static char peekNext() {
-    if (isAtEnd())
-        return '\0';
+    if (isAtEnd()) return '\0';
     return scanner.current[1];
 }
 
 static bool match(char expected) {
-    if (isAtEnd())
-        return false;
-    if (*scanner.current != expected)
-        return false;
+    if (isAtEnd()) return false;
+    if (*scanner.current != expected) return false;
     scanner.current++;
     return true;
 }
@@ -89,8 +81,7 @@ static void skipWhitespace() {
             case '#':
                 if (peekNext() == '#') {
                     // A comment goes until the end of the line.
-                    while (peek() != '\n' && !isAtEnd())
-                        advance();
+                    while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     return;
                 }
@@ -101,9 +92,7 @@ static void skipWhitespace() {
     }
 }
 
-static TokenType checkKeyword(int start,
-                              int length,
-                              const char* rest,
+static TokenType checkKeyword(int start, int length, const char* rest,
                               TokenType type) {
     if (scanner.current - scanner.start == start + length &&
         memcmp(scanner.start + start, rest, length) == 0) {
@@ -165,22 +154,19 @@ static TokenType identifierType() {
 }
 
 static Token identifier() {
-    while (isAlpha(peek()) || isDigit(peek()))
-        advance();
+    while (isAlpha(peek()) || isDigit(peek())) advance();
     return makeToken(identifierType());
 }
 
 static Token number() {
-    while (isDigit(peek()))
-        advance();
+    while (isDigit(peek())) advance();
 
     // Look for decimal
     if (peek() == '.' && isDigit(peekNext())) {
         // Consume the "."
         advance();
 
-        while (isDigit(peek()))
-            advance();
+        while (isDigit(peek())) advance();
     }
 
     return makeToken(TOKEN_NUMBER);
@@ -188,13 +174,11 @@ static Token number() {
 
 static Token string() {
     while (peek() != '"' && !isAtEnd()) {
-        if (peek() == '\n')
-            scanner.line++;
+        if (peek() == '\n') scanner.line++;
         advance();
     }
 
-    if (isAtEnd())
-        return errorToken("Err: UnterminatedStringErr.");
+    if (isAtEnd()) return errorToken("Err: UnterminatedStringErr.");
 
     // Closing quote
     advance();
@@ -205,14 +189,11 @@ Token scanToken() {
     skipWhitespace();
     scanner.start = scanner.current;
 
-    if (isAtEnd())
-        return makeToken(TOKEN_EOF);
+    if (isAtEnd()) return makeToken(TOKEN_EOF);
 
     char c = advance();
-    if (isAlpha(c))
-        return identifier();
-    if (isDigit(c))
-        return number();
+    if (isAlpha(c)) return identifier();
+    if (isDigit(c)) return number();
 
     switch (c) {
         case '(':

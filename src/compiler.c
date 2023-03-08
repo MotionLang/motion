@@ -1,9 +1,10 @@
+#include "/workspaces/motionLang/include/compiler.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "/workspaces/motionLang/include/chunk.h"
 #include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/compiler.h"
 #include "/workspaces/motionLang/include/scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
@@ -43,13 +44,10 @@ Parser parser;
 
 Chunk* compilingChunk;
 
-static Chunk* currentChunk() {
-    return compilingChunk;
-}
+static Chunk* currentChunk() { return compilingChunk; }
 
 static void errorAt(Token* token, const char* message) {
-    if (parser.panicMode)
-        return;
+    if (parser.panicMode) return;
     parser.panicMode = true;
     fprintf(stderr, "[line %d] Err", token->line);
 
@@ -65,9 +63,7 @@ static void errorAt(Token* token, const char* message) {
     parser.hadError = true;
 }
 
-static void error(const char* message) {
-    errorAt(&parser.previous, message);
-}
+static void error(const char* message) { errorAt(&parser.previous, message); }
 
 static void errorAtCurrent(const char* message) {
     errorAt(&parser.current, message);
@@ -78,8 +74,7 @@ static void advance() {
 
     for (;;) {
         parser.current = scanToken();
-        if (parser.current.type != TOKEN_ERROR)
-            break;
+        if (parser.current.type != TOKEN_ERROR) break;
 
         errorAtCurrent(parser.current.start);
     }
@@ -94,6 +89,14 @@ static void consume(TokenType type, const char* message) {
     errorAtCurrent(message);
 }
 
+static bool check(TokenType type) { return parser.current.type == type; }
+
+static bool match(TokenType type) {
+    if (!check(type)) return false;
+    advance();
+    return true;
+}
+
 static void emitByte(uint8_t byte) {
     writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -103,9 +106,7 @@ static void emitBytes(uint8_t byte1, uint8_t byte2) {
     emitByte(byte2);
 }
 
-static void emitReturn() {
-    emitByte(OP_RETURN);
-}
+static void emitReturn() { emitByte(OP_RETURN); }
 
 static uint8_t makeConstant(Value value) {
     int constant = addConstant(currentChunk(), value);
@@ -131,6 +132,8 @@ static void endCompiler() {
 }
 
 static void expression();
+static void statement();
+static void declaration();
 static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
@@ -284,12 +287,22 @@ static void parsePrecedence(Precedence precedence) {
     }
 }
 
-static ParseRule* getRule(TokenType type) {
-    return &rules[type];
+static ParseRule* getRule(TokenType type) { return &rules[type]; }
+
+static void expression() { parsePrecedence(PREC_ASSIGNMENT); }
+
+static void printStatement() {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expected ';' after value");
+    emitByte(OP_PRINT);
 }
 
-static void expression() {
-    parsePrecedence(PREC_ASSIGNMENT);
+static void declaration() { statement(); }
+
+static void statement() {
+    if (match(TOKEN_PRINT)) {
+        printStatement();
+    }
 }
 
 bool compile(const char* source, Chunk* chunk) {
@@ -300,8 +313,11 @@ bool compile(const char* source, Chunk* chunk) {
     parser.panicMode = false;
 
     advance();
-    expression();
-    consume(TOKEN_EOF, "Expected End of Expression");
+
+    while (!match(TOKEN_EOF)) {
+        declaration();
+    }
+
     endCompiler();
     return !parser.hadError;
 }
