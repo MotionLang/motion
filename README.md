@@ -13,22 +13,20 @@ Motion is licensed under GNU GPL v3.0.
 Motion's syntax aspires to be fresh, readable, and clean.
 
 ```
-var: x = 10;
-var: y = 5;
 ## Comments are cool.
 
-func: myFunc(a, b) {
-  while: (a < b) {
-    a + 1;
-   }
+var: x ## Declared variables are set to nil.
+var: y = 10; var: z = 2 
+
+## ^^^^ Multiline statements with ";"
+
+func: myNewFunction(a, b){
+    result = @a + @b
+    ## "@" specifies perameters.
+    print: result
 }
 
-if: (x > y) {
-  myFunc(y, x);
-  } else: {
-    myFunc(x, y);
-  }
-}
+myNewFunction(x, y)
 
 ```
 For more examples, see ```/examples```
