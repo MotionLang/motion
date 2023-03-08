@@ -178,7 +178,7 @@ static Token string() {
         advance();
     }
 
-    if (isAtEnd()) return errorToken("Err: UnterminatedStringErr.");
+    if (isAtEnd()) return errorToken("UnterminatedStringErr.");
 
     // Closing quote
     advance();
@@ -206,6 +206,7 @@ Token scanToken() {
             return makeToken(TOKEN_RIGHT_BRACE);
         case ';':
             return makeToken(TOKEN_SEMICOLON);
+        // Add replacement for newline with semicolon
         case ',':
             return makeToken(TOKEN_COMMA);
         case '.':
