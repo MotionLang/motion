@@ -1,6 +1,7 @@
+#include "/workspaces/motionLang/include/memory.h"
+
 #include <stdlib.h>
 
-#include "/workspaces/motionLang/include/memory.h"
 #include "/workspaces/motionLang/include/vm.h"
 
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
@@ -11,8 +12,7 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 
     void* result = realloc(pointer, newSize);
     // Null Case Handling.
-    if (result == NULL)
-        exit(1);
+    if (result == NULL) exit(1);
     return result;
 }
 

@@ -1,7 +1,8 @@
 #include "/workspaces/motionLang/include/chunk.h"
-#include "/workspaces/motionLang/include/memory.h"
 
 #include <stdlib.h>
+
+#include "/workspaces/motionLang/include/memory.h"
 
 void initChunk(Chunk* chunk) {
     chunk->count = 0;

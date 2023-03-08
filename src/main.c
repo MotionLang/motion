@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/common.h"
 #include "/workspaces/motionLang/include/chunk.h"
+#include "/workspaces/motionLang/include/common.h"
 #include "/workspaces/motionLang/include/debug.h"
 #include "/workspaces/motionLang/include/memory.h"
 #include "/workspaces/motionLang/include/vm.h"
@@ -63,7 +63,7 @@ static void runFile(const char* path) {
 
 int main(int argc, const char* argv[]) {
     initVM();
-    
+
     if (argc == 1) {
         repl();
     } else if (argc == 2) {
