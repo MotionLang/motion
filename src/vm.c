@@ -133,7 +133,7 @@ static InterpretResult run() {
                 pop();
                 break;
             case OP_GET_LOCAL: {
-                uint8_t slot = READ_BYTE;
+                uint8_t slot = READ_BYTE();
                 push(vm.stack[slot]);
                 break;
             }
