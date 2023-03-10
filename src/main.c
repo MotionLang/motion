@@ -9,6 +9,8 @@
 #include "/workspaces/motionLang/include/vm.h"
 
 static void repl() {
+    printf("Motion v0.01");
+    printf("\n");
     char line[1024];
     for (;;) {
         printf("Motion $ ");
