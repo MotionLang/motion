@@ -1,1 +1,10 @@
-print 1 + 1;
+print: 1 + 1;
+
+func: myFunc(a, b, c) {
+    var: d;
+    while: (c <= d) {
+        var: result = a + b;
+        c++;
+    }
+    return: result;
+}

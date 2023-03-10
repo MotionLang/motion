@@ -22,7 +22,7 @@ static void runtimeError(const char *format, ...) {
     fputs("\n", stderr);
 
     size_t instruction = vm.ip - vm.chunk->code - 1;
-    int line = vm.chunk->lines[instruction];
+    int line           = vm.chunk->lines[instruction];
     fprintf(stderr, "[line %d] in script\n", line);
     resetStack();
 }
@@ -76,7 +76,7 @@ static void concatenate() {
     ObjString *b = AS_STRING(pop());
     ObjString *a = AS_STRING(pop());
 
-    int length = a->length + b->length;
+    int length  = a->length + b->length;
     char *chars = ALLOCATE(char, length + 1);
     memcpy(chars, a->chars, a->length);
     memcpy(chars + a->length, b->chars, b->length);
@@ -91,6 +91,7 @@ static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define READ_STRING() AS_STRING(READ_CONSTANT())
+#define READ_SHORT() (vm.ip += 2, (uint16_t)((vm.ip[-2] << 8) | vm.ip[-1]))
 #define BINARY_OP(valueType, op)                          \
     do {                                                  \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
@@ -120,25 +121,17 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
-            case OP_NIL:
-                push(NIL_VAL);
-                break;
-            case OP_TRUE:
-                push(BOOL_VAL(true));
-                break;
-            case OP_FALSE:
-                push(BOOL_VAL(false));
-                break;
-            case OP_POP:
-                pop();
-                break;
+            case OP_NIL: push(NIL_VAL); break;
+            case OP_TRUE: push(BOOL_VAL(true)); break;
+            case OP_FALSE: push(BOOL_VAL(false)); break;
+            case OP_POP: pop(); break;
             case OP_GET_LOCAL: {
                 uint8_t slot = READ_BYTE();
                 push(vm.stack[slot]);
                 break;
             }
             case OP_SET_LOCAL: {
-                uint8_t slot = READ_BYTE();
+                uint8_t slot   = READ_BYTE();
                 vm.stack[slot] = peek(0);
                 break;
             }
@@ -174,12 +167,8 @@ static InterpretResult run() {
                 break;
             }
 
-            case OP_GREATER:
-                BINARY_OP(BOOL_VAL, >);
-                break;
-            case OP_LESS:
-                BINARY_OP(BOOL_VAL, <);
-                break;
+            case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+            case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
 
             case OP_ADD: {
                 if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
@@ -196,18 +185,10 @@ static InterpretResult run() {
                 }
                 break;
             }
-            case OP_SUBTRACT:
-                BINARY_OP(NUMBER_VAL, -);
-                break;
-            case OP_MULTIPLY:
-                BINARY_OP(NUMBER_VAL, *);
-                break;
-            case OP_DIVIDE:
-                BINARY_OP(NUMBER_VAL, /);
-                break;
-            case OP_NOT:
-                push(BOOL_VAL(isFalsey(pop())));
-                break;
+            case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
+            case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
+            case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
+            case OP_NOT: push(BOOL_VAL(isFalsey(pop()))); break;
             case OP_NEGATE:
                 if (!IS_NUMBER(peek(0))) {
                     runtimeError("InvalidOperatorErr");
@@ -220,6 +201,16 @@ static InterpretResult run() {
                 printf("\n");
                 break;
             }
+            case OP_JUMP: {
+                uint8_t offset = READ_SHORT();
+                vm.ip += offset;
+                break;
+            }
+            case OP_JUMP_IF_FALSE: {
+                uint16_t offset = READ_SHORT();
+                if (isFalsey(peek(0))) { vm.ip += offset; }
+                break;
+            }
             case OP_RETURN: {
                 // Exit Interpreter
                 return INTERPRET_OK;
@@ -227,6 +218,7 @@ static InterpretResult run() {
         }
     }
 #undef READ_BYTE
+#undef READ_SHORT
 #undef READ_CONSTANT
 #undef READ_STRING
 #undef BINARY_OP
@@ -242,7 +234,7 @@ InterpretResult interpret(const char *source) {
     }
 
     vm.chunk = &chunk;
-    vm.ip = vm.chunk->code;
+    vm.ip    = vm.chunk->code;
 
     InterpretResult result = run();
 
