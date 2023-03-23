@@ -204,6 +204,7 @@ static ObjFunction* endCompiler() {
                                              : "<script>");
     }
 #endif
+
     current = current->enclosing;
     return function;
 }
@@ -237,7 +238,7 @@ static bool identifiersEqual(Token* a, Token* b) {
 }
 
 static int resolveLocal(Compiler* compiler, Token* name) {
-    for (int i = compiler->localCount - 1; i >= 0; i++) {
+    for (int i = compiler->localCount - 1; i >= 0; i--) {
         Local* local = &compiler->locals[i];
         if (identifiersEqual(name, &local->name)) {
             if (local->depth == -1) {
