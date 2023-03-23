@@ -5,10 +5,11 @@ print("Var Tests loaded")
 def testvars():
     """Testing variables"""
     directory = '/workspaces/motionLang/tests/testfiles/vartests'
-    for filename in os.listdir(directory):
-        f = os.path.join(directory, filename)
+    for i in os.listdir(directory):
+        f = os.path.join(directory, i)
         # checking if it is a file
         if os.path.isfile(f):
             f = f.replace("/workspaces/motionLang/", '')
-            print(f)
-            os.system("motion " + f)
+            cmd = "motion " + f
+            res = subprocess.check_output(cmd, shell=True)
+            print(res)
