@@ -2,15 +2,23 @@
 #define clox_vm_h
 
 #include "/workspaces/motionLang/include/chunk.h"
+#include "/workspaces/motionLang/include/object.h"
 #include "/workspaces/motionLang/include/table.h"
 #include "/workspaces/motionLang/include/value.h"
 
-#define STACK_MAX 256
+#define FRAMES_MAX 64
+#define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
 
-// stackTop became stackCount, an int
 typedef struct {
-    Chunk *chunk;
+    ObjFunction *function;
     uint8_t *ip;
+    Value *slots;
+} CallFrame;
+
+typedef struct {
+    CallFrame frames[FRAMES_MAX];
+    int frameCount;
+
     Value stack[STACK_MAX];
     Value *stackTop;
     Table globals;
