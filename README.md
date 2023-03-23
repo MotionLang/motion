@@ -12,15 +12,21 @@ Motion is licensed under GNU GPL v3.0.
 
 Motion's syntax aspires to be fresh, readable, and clean.
 
-```motion
+```
 ## Comments are cool.
 
-var: x; ## Declared variables are set to nil.
-var: y = 10; var: z = 2;
+var x; ## Declared variables are set to nil.
+var y = 10; var z = 2;
 
 ## ^^^^ Multiline statements with ";"
 
 print x * y;
+
+func add(a, b) {
+	var new = (a + b);
+	print new;
+	return new;
+}
 
 ```
 
