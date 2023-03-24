@@ -310,8 +310,8 @@ static void defineVariable(uint8_t global) {
 }
 
 static uint8_t argumentList() {
-     uint8_t argCount = 0; 
-     if (!check(TOKEN_RIGHT_PAREN)) {
+    uint8_t argCount = 0;
+    if (!check(TOKEN_RIGHT_PAREN)) {
         do {
             expression();
             if (argCount == 255) {
@@ -319,9 +319,9 @@ static uint8_t argumentList() {
             }
             argCount++;
         } while (match(TOKEN_COMMA));
-     }
-     consume(TOKEN_RIGHT_PAREN, "Expected a ')' after arguments");
-     return argCount;
+    }
+    consume(TOKEN_RIGHT_PAREN, "Expected a ')' after arguments");
+    return argCount;
 }
 
 static void and_(bool canAssign) {
@@ -561,7 +561,7 @@ static void function(FunctionType type) {
     block();
 
     ObjFunction* function = endCompiler();
-    emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+    emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
 }
 
 static void funDeclaration() {

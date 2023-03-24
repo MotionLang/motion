@@ -11,6 +11,6 @@
 //#define DEBUG_TRACE_EXECUTION
 
 // Except for this.
-#define UINT8_COUNT (UINT8_MAX + 1) 
+#define UINT8_COUNT (UINT8_MAX + 1)
 
 #endif

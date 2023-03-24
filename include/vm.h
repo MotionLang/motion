@@ -10,9 +10,9 @@
 #define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
 
 typedef struct {
-    ObjFunction *function;
-    uint8_t *ip;
-    Value *slots;
+    ObjClosure* closure;
+    uint8_t* ip;
+    Value* slots;
 } CallFrame;
 
 typedef struct {
@@ -20,10 +20,10 @@ typedef struct {
     int frameCount;
 
     Value stack[STACK_MAX];
-    Value *stackTop;
+    Value* stackTop;
     Table globals;
     Table strings;
-    Obj *objects;
+    Obj* objects;
 } VM;
 
 typedef enum {
@@ -36,7 +36,7 @@ extern VM vm;
 
 void initVM();
 void freeVM();
-InterpretResult interpret(const char *source);
+InterpretResult interpret(const char* source);
 void push(Value value);
 Value pop();
 
