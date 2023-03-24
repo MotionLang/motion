@@ -4,5 +4,5 @@ func fib(n) {
 }
 
 var start = clock();
-print fib(10);
+print fib(33);
 print clock() - start;

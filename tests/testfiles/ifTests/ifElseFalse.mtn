@@ -1,0 +1,7 @@
+var x = 10;
+
+if (x == 100) {
+    print "if";
+} else {
+    print "else";
+}
