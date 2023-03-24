@@ -35,7 +35,8 @@ For more examples, see ```/examples```
 ## Contribution
 
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
-Otherwise, support of any kind is welcome!
+
+However, I need more tests. If you create a test,  update  ```tests.py``` found in ```tests/testfiles```. Then submit a pull request.
 
 ## Features
 
