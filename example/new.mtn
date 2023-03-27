@@ -1,9 +1,0 @@
-var x = 11;
-
-## comment
-
-if (x == 10) {
-    print "uh oh";
-} else {
-    print "yay";
-}
