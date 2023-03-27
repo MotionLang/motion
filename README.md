@@ -45,8 +45,8 @@ Motion supports (or will support):
 * :heavy_check_mark: First Class Functions & Closures
 * :heavy_check_mark: Logical & Arithmetic Operators
 * :heavy_check_mark: Loops
-* :heavy_check_mark: Variables and scope
-* :heavy_check_mark: Comments
+* :heavy_check_mark: Scoped Variables
+* :heavy_check_mark: Closures
 * And more! (hopefully)
 
 ## Compiling
