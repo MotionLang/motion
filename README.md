@@ -2,11 +2,9 @@
 
 Motion is a dynamically typed general purpose programming language designed to help developers write fast, clean, and efficient code for a modern world.
 
-Motion is created in pure C, with no dependancies.
+Motion is created in pure ANSI C, with no dependancies.
 
-Motion is a variation of the Lox language found at www.craftinginterpreters.com.
-
-Motion is licensed under GNU GPL v3.0.
+Motion is a variation of the Lox language found at www.craftinginterpreters.com and is licensed under GNU GPL v3.0.
 
 ## Syntax
 
@@ -43,30 +41,33 @@ To add a new test, fork the repository. Then, update  [```test.py```](tests/test
 
 Motion supports (or will support):
 
-* Dynamic Typing
-* First Class Functions & Closures
-* Classes
-* Automatic Memory Management with Garbage Collection
-* Logical & Arithmetic Operators
-* While Loops
+* :heavy_check_mark: Dynamic Typing
+* :heavy_check_mark: First Class Functions & Closures
+* :heavy_check_mark: Logical & Arithmetic Operators
+* :heavy_check_mark: Loops
+* :heavy_check_mark: Variables and scope
+* :heavy_check_mark: Comments
 * And more! (hopefully)
 
 ## Compiling
 
-If you want to compile, first clone the repo.
+If you want to compile, first clone the repo using:
+
+### Git:
+	git clone https://github.com/UPWRD1/motionLang.git
+	
+### Github CLI:
+	`gh repo clone UPWRD1/motionLang`
 
 Then, use the following command:
 
-```bash
-gcc  -fdiagnostics-color=always -g -Wall *.c -o output
-```
 
-Alternatively, in vscode, use the ```tasks.json``` file found in ```./vscode```.
+
 
 After compilation, run
 
 `
-build/output
+build/motion
 `
 in a terminal.
 
