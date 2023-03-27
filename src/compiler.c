@@ -44,6 +44,7 @@ typedef struct {
 typedef struct {
     Token name;
     int depth;
+    bool isCaptured;
 } Local;
 
 typedef struct {
@@ -63,8 +64,9 @@ typedef struct Compiler {
 
     Local locals[UINT8_COUNT];
     int localCount;
-    Upvalue* upvalues[UINT8_COUNT];
+    Upvalue upvalues[UINT8_COUNT];
     int scopeDepth;
+
 } Compiler;
 
 Parser parser;
@@ -199,6 +201,7 @@ static void initCompiler(Compiler* compiler, FunctionType type) {
 
     Local* local = &current->locals[current->localCount++];
     local->depth = 0;
+    local->isCaptured = false;
     local->name.start = "";
     local->name.length = 0;
 }
@@ -226,7 +229,11 @@ static void endScope() {
     while (current->localCount > 0 &&
            current->locals[current->localCount - 1].depth >
                current->scopeDepth) {
-        emitByte(OP_POP);
+        if(current->locals[current->localCount - 1].isCaptured) {
+            emitByte(OP_CLOSE_UPVALUE);
+        } else {
+            emitByte(OP_POP);
+        }
         current->localCount--;
     }
 }
@@ -277,6 +284,7 @@ static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal) {
 
     compiler->upvalues[upvalueCount].isLocal = isLocal;
     compiler->upvalues[upvalueCount].index = index;
+
     return compiler->function->upvalueCount++;
 }
 
@@ -285,7 +293,13 @@ static int resolveUpvalue(Compiler* compiler, Token* name) {
 
     int local = resolveLocal(compiler->enclosing, name);
     if (local != -1) {
+        compiler->enclosing->locals[local].isCaptured = true;
         return addUpvalue(compiler, (uint8_t)local, true);
+    }
+
+    int upvalue = resolveUpvalue(compiler->enclosing, name);
+    if (upvalue != -1) {
+        return addUpvalue(compiler, (uint8_t)upvalue, false);
     }
 
     return -1;
@@ -300,6 +314,7 @@ static void addLocal(Token name) {
     Local* local = &current->locals[current->localCount++];
     local->name = name;
     local->depth = -1;
+    local->isCaptured = false;
     local->depth = current->scopeDepth;
 }
 
@@ -606,9 +621,14 @@ static void function(FunctionType type) {
 
     ObjFunction* function = endCompiler();
     emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
+
+    for (int i = 0; i < function->upvalueCount; i++) {
+        emitByte(compiler.upvalues[i].isLocal ? 1 : 0);
+        emitByte(compiler.upvalues[i].index);
+    }
 }
 
-static void funDeclaration() {
+static void funcDeclaration() {
     uint8_t global = parseVariable("Expected Function Name");
     markInitialized();
     function(TYPE_FUNCTION);
@@ -760,7 +780,7 @@ static void synchronize() {
 
 static void declaration() {
     if (match(TOKEN_FUNC)) {
-        funDeclaration();
+        funcDeclaration();
     } else if (match(TOKEN_VAR)) {
         varDeclaration();
     } else {
