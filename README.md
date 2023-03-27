@@ -37,7 +37,7 @@ For more examples, see ```/examples```
 Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
 
 However, more tests are always welcome. 
-To add a new test, fork the repository. Then, update  ```tests.py``` found in ```tests/testfiles```, and submit a pull request.
+To add a new test, fork the repository. Then, update  [```test.py```](tests/test.py) found in ```/tests```, and submit a pull request.
 
 ## Features
 
@@ -65,10 +65,9 @@ Alternatively, in vscode, use the ```tasks.json``` file found in ```./vscode```.
 
 After compilation, run
 
-```bash
+`
 build/output
-```
-
+`
 in a terminal.
 
 Makefile suppport coming soon.
