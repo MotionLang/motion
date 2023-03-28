@@ -7,6 +7,7 @@
 #include "/workspaces/motionLang/include/chunk.h"
 #include "/workspaces/motionLang/include/common.h"
 #include "/workspaces/motionLang/include/scanner.h"
+#include "/workspaces/motionLang/include/memory.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "/workspaces/motionLang/include/debug.h"
@@ -828,4 +829,12 @@ ObjFunction* compile(const char* source) {
 
     ObjFunction* function = endCompiler();
     return parser.hadError ? NULL : function;
+}
+
+void markCompilerRoots() { 
+    Compiler* compiler = current; 
+    while(compiler != NULL) {
+        markObject((Obj*)compiler->function);
+        compiler = compiler->enclosing;
+    }
 }
