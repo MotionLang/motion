@@ -131,7 +131,7 @@ static void blackenObject(Obj* object) {
             break;
         }
         case OBJ_UPVALUE:
-            markvalue(((ObjUpvalue*)object)->closed);
+            markValue(((ObjUpvalue*)object)->closed);
             break;
         case OBJ_NATIVE:
         case OBJ_STRING:
