@@ -1,4 +1,5 @@
-# Getting Started with Motion.
+# Getting Started with Motion
+# Part 1: Welcome and Installation
 
 ## Intro
 Welcome! If you are reading this, then you are on the path to start developing with Motion. In this guide, you will learn the basics of installing, running, and programming in Motion.
