@@ -42,7 +42,7 @@ To add a new test, fork the repository. Then, update  [```test.py```](tests/test
 Motion supports (or will support):
 
 * :heavy_check_mark: Dynamic Typing
-* :heavy_check_mark: First Class Functions & Closures
+* :heavy_check_mark: First Class Functions & Objects
 * :heavy_check_mark: Logical & Arithmetic Operators
 * :heavy_check_mark: Loops
 * :heavy_check_mark: Scoped Variables
