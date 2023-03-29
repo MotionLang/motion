@@ -18,3 +18,5 @@ If you wish to use git, run
 
 Alternatively, download the zip file, and extract.
 
+Once you have a copy of the repository, run `make` in a terminal. 
+This will build the most recent version of Motion.
