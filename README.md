@@ -50,25 +50,4 @@ Motion supports (or will support):
 * And more! (hopefully)
 
 ## Compiling
-
-If you want to compile, first clone the repo using:
-
-### Git:
-	git clone https://github.com/UPWRD1/motionLang.git
-	
-### Github CLI:
-	`gh repo clone UPWRD1/motionLang`
-
-Then, use the following command:
-
-
-
-
-After compilation, run
-
-`
-build/motion
-`
-in a terminal.
-
-Makefile suppport coming soon.
+See [Getting Started](docs/Getting_Started/Installation.md)
