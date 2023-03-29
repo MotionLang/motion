@@ -1,8 +1,8 @@
 #ifndef clox_chunk_h
 #define clox_chunk_h
 
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/value.h"
+#include "/workspaces/motion/src/include/value.h"
+#include "/workspaces/motion/src/include/common.h"
 
 typedef enum {
     OP_CONSTANT,

@@ -1,9 +1,9 @@
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/compiler.h"
+#include "/workspaces/motion/src/include/memory.h"
 
 #include <stdlib.h>
 
-#include "/workspaces/motionLang/include/vm.h"
+#include "/workspaces/motion/src/include/compiler.h"
+#include "/workspaces/motion/src/include/vm.h"
 
 #ifdef DEBUG_LOG_GC
 #include <stdio.h>

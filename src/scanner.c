@@ -1,9 +1,9 @@
-#include "/workspaces/motionLang/include/scanner.h"
+#include "/workspaces/motion/src/include/scanner.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/common.h"
+#include "/workspaces/motion/src/include/common.h"
 
 typedef struct {
     const char* start;

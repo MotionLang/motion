@@ -1,16 +1,16 @@
-#include "/workspaces/motionLang/include/compiler.h"
+#include "/workspaces/motion/src/include/compiler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/chunk.h"
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/scanner.h"
-#include "/workspaces/motionLang/include/memory.h"
+#include "/workspaces/motion/src/include/chunk.h"
+#include "/workspaces/motion/src/include/common.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
-#include "/workspaces/motionLang/include/debug.h"
+#include "/workspaces/motion/src/include/debug.h"
 #endif
 
 typedef struct {
