@@ -69,9 +69,25 @@ int main(int argc, const char* argv[]) {
     if (argc == 1) {
         repl();
     } else if (argc == 2) {
-        runFile(argv[1]);
+        if ((strcmp(argv[1], "--info")) || (strcmp(argv[1], "-i") == 0)) {
+            printf("Motion v0.0.5\n");
+            printf("\n");
+        } else if ((strcmp(argv[1], "--help")) || (strcmp(argv[1], "-h") == 0)) {
+            printf("Help:\n");
+            printf("No Command: Launch REPL\n");
+            printf("info: Information about Motion\n");
+            printf("run:  Run file\n");
+            printf("help: This command\n");
+        } else {
+            fprintf(stderr, "Invalid Command");
+        }
+    } else if (argc == 3) {
+        if ((strcmp(argv[1], "--run")) || (strcmp(argv[1], "-r")) == 0) {
+            runFile(argv[2]);
+        }
+
     } else {
-        fprintf(stderr, "InvalidPathErr");
+        fprintf(stderr, "Invalid Command");
     }
 
     freeVM();

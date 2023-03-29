@@ -1,1 +1,1 @@
-export PATH=$PATH:/workspaces/motionLang/build
+export PATH=$PATH:/workspaces/motionLang/buildexport PATH=$PATH:/workspaces/motionLang/build
