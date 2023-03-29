@@ -1,9 +1,9 @@
 #ifndef clox_object_h
 #define clox_object_h
 
-#include "/workspaces/motionLang/include/chunk.h"
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/value.h"
+#include "/workspaces/motion/src/include/chunk.h"
+#include "/workspaces/motion/src/include/common.h"
+#include "/workspaces/motion/src/include/value.h"
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 

@@ -1,12 +1,12 @@
-#include "/workspaces/motionLang/include/table.h"
+#include "/workspaces/motion/src/include/table.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/object.h"
-#include "/workspaces/motionLang/include/value.h"
+#include "/workspaces/motion/src/include/common.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/object.h"
+#include "/workspaces/motion/src/include/value.h"
 
 #define TABLE_MAX_LOAD 0.75
 

@@ -1,10 +1,10 @@
 #ifndef clox_vm_h
 #define clox_vm_h
 
-#include "/workspaces/motionLang/include/chunk.h"
-#include "/workspaces/motionLang/include/object.h"
-#include "/workspaces/motionLang/include/table.h"
-#include "/workspaces/motionLang/include/value.h"
+#include "/workspaces/motion/src/include/chunk.h"
+#include "/workspaces/motion/src/include/object.h"
+#include "/workspaces/motion/src/include/table.h"
+#include "/workspaces/motion/src/include/value.h"
 
 #define FRAMES_MAX 64
 #define STACK_MAX (FRAMES_MAX * UINT8_COUNT)

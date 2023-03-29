@@ -1,9 +1,9 @@
-#include "/workspaces/motionLang/include/chunk.h"
+#include "/workspaces/motion/src/include/chunk.h"
 
 #include <stdlib.h>
 
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/vm.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/vm.h"
 
 void initChunk(Chunk* chunk) {
     chunk->count = 0;

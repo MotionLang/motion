@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/chunk.h"
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/debug.h"
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/vm.h"
+#include "/workspaces/motion/src/include/chunk.h"
+#include "/workspaces/motion/src/include/common.h"
+#include "/workspaces/motion/src/include/debug.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/vm.h"
 
 static void repl() {
     printf("Motion v0.05");

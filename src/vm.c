@@ -1,15 +1,15 @@
-#include "/workspaces/motionLang/include/vm.h"
+#include "/workspaces/motion/src/include/vm.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
-#include "/workspaces/motionLang/include/common.h"
-#include "/workspaces/motionLang/include/compiler.h"
-#include "/workspaces/motionLang/include/debug.h"
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/object.h"
+#include "/workspaces/motion/src/include/common.h"
+#include "/workspaces/motion/src/include/compiler.h"
+#include "/workspaces/motion/src/include/debug.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/object.h"
 
 VM vm;
 // Native Function Declarations

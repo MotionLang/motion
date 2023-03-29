@@ -1,10 +1,10 @@
-#include "/workspaces/motionLang/include/value.h"
+#include "/workspaces/motion/src/include/value.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#include "/workspaces/motionLang/include/memory.h"
-#include "/workspaces/motionLang/include/object.h"
+#include "/workspaces/motion/src/include/memory.h"
+#include "/workspaces/motion/src/include/object.h"
 
 void initValueArray(ValueArray *array) {
     array->values = NULL;
