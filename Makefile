@@ -1,0 +1,45 @@
+OBJS	= main.o chunk.o compiler.o debug.o memory.o object.o scanner.o table.o value.o vm.o
+SOURCE	= main.c chunk.c compiler.c debug.c memory.c object.c scanner.c table.c value.c vm.c
+HEADER	= common.h chunk.h compiler.h debug.h memory.h object.h scanner.h table.h value.h vm.h
+OUT	= motion
+CC	 = gcc
+FLAGS	 = -g -c -Wall
+VPATH = src include 
+OBJDIR = src/obj
+
+all: $(OBJS)
+	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
+
+main.o: main.c
+	$(CC) $(FLAGS) src/main.c -std=c99
+
+chunk.o: chunk.c
+	$(CC) $(FLAGS) src/chunk.c -std=c99
+
+compiler.o: compiler.c
+	$(CC) $(FLAGS) src/compiler.c -std=c99
+
+debug.o: debug.c
+	$(CC) $(FLAGS) src/debug.c -std=c99
+
+memory.o: memory.c
+	$(CC) $(FLAGS) src/memory.c -std=c99
+
+object.o: object.c
+	$(CC) $(FLAGS) src/object.c -std=c99
+
+scanner.o: scanner.c
+	$(CC) $(FLAGS) src/scanner.c -std=c99
+
+table.o: table.c
+	$(CC) $(FLAGS) src/table.c -std=c99
+
+value.o: value.c
+	$(CC) $(FLAGS) src/value.c -std=c99
+
+vm.o: vm.c
+	$(CC) $(FLAGS) src/vm.c -std=c99
+
+
+clean:
+	rm -f $(OBJS) $(OUT)
