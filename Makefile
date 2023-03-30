@@ -9,6 +9,8 @@ OBJDIR = src/obj
 
 all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
+	mv $(OBJS) src/obj
+	mv $(OUT) bin
 
 main.o: main.c
 	$(CC) $(FLAGS) src/main.c -std=c99
@@ -42,7 +44,6 @@ vm.o: vm.c
 
 
 clean:
-	rm -f $(OBJS) $(OUT)
-
-move:
-	mv $(OBJS) src/obj
+	rm -fvr $(OBJDIR)
+	rm -fv bin/$(OUT)
+	mkdir src/obj

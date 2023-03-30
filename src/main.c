@@ -9,11 +9,12 @@
 #include "/workspaces/motion/src/include/vm.h"
 
 static void repl() {
-    printf("Motion v0.05");
+    printf("Motion v0.05\n");
+    printf("Ctrl-C to Exit\n");
     printf("\n");
     char line[1024];
     for (;;) {
-        printf("Motion $ ");
+        printf("~> ");
 
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");
@@ -75,9 +76,9 @@ int main(int argc, const char* argv[]) {
         } else if ((strcmp(argv[1], "--help")) || (strcmp(argv[1], "-h") == 0)) {
             printf("Help:\n");
             printf("No Command: Launch REPL\n");
-            printf("info: Information about Motion\n");
-            printf("run:  Run file\n");
-            printf("help: This command\n");
+            printf("--info: Information about Motion\n");
+            printf("--run:  Run file\n");
+            printf("--help: This command\n");
         } else {
             fprintf(stderr, "Invalid Command");
         }
