@@ -43,3 +43,6 @@ vm.o: vm.c
 
 clean:
 	rm -f $(OBJS) $(OUT)
+
+move:
+	mv $(OBJS) src/obj
