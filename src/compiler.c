@@ -597,7 +597,7 @@ static void block() {
         declaration();
     }
 
-    consume(TOKEN_RIGHT_BRACE, "Expected '}' after block.");
+    consume(TOKEN_RIGHT_BRACE, "Expected keyword 'end' after block.");
 }
 
 static void function(FunctionType type) {
@@ -617,7 +617,7 @@ static void function(FunctionType type) {
         } while (match(TOKEN_COMMA));
     }
     consume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_LEFT_BRACE, "Expected '{' before function body");
+    consume(TOKEN_LEFT_BRACE, "Expected a '|' before function body");
     block();
 
     ObjFunction* function = endCompiler();
@@ -645,7 +645,7 @@ static void varDeclaration() {
         emitByte(OP_NIL);
     }
     consume(TOKEN_SEMICOLON,
-            "Expected ';' or newline after variable declaration.");
+            "Expected ';' after variable declaration.");
 
     defineVariable(global);
 }
@@ -683,7 +683,7 @@ static void forStatement() {
         int incrementStart = currentChunk()->count;
         expression();
         emitByte(OP_POP);
-        consume(TOKEN_RIGHT_PAREN, "Expected ')' after for clause");
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' after 'for' clause");
 
         emitLoop(loopStart);
         loopStart = incrementStart;
@@ -702,7 +702,7 @@ static void forStatement() {
 }
 
 static void ifStatement() {
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'if')");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'if')");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
 
@@ -720,6 +720,13 @@ static void ifStatement() {
     }
 
     patchJump(elseJump);
+}
+
+static void swearStatement() {
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'swear')");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
+    consume(TOKEN_SEMICOLON, "Expected ';' after 'swear()'");
 }
 
 static void printStatement() {
@@ -744,7 +751,7 @@ static void returnStatement() {
 
 static void whileStatement() {
     int loopStart = currentChunk()->count;
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'while'");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'while'");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
 
@@ -800,6 +807,8 @@ static void statement() {
         forStatement();
     } else if (match(TOKEN_IF)) {
         ifStatement();
+    } else if (match(TOKEN_SWEAR)) {
+        swearStatement();
     } else if (match(TOKEN_RETURN)) {
         returnStatement();
     } else if (match(TOKEN_WHILE)) {

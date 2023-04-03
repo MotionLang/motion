@@ -1,23 +1,23 @@
 var globalOne;
 var globalTwo;
 
-func main() {
-  {
+func main() |
+  |
     var a = "one";
-    func one() {
+    func one() |
       print a;
-    }
+    end
     globalOne = one;
-  }
+  end
 
-  {
+  |
     var a = "two";
-    func two() {
+    func two() |
       print a;
-    }
+    end
     globalTwo = two;
-  }
-}
+  end
+end
 
 main();
 globalOne();

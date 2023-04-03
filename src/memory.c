@@ -7,7 +7,7 @@
 
 #ifdef DEBUG_LOG_GC
 #include <stdio.h>
-#include "/workspaces/motionLang/include/debug.h"
+#include "/workspaces/motion/src/include/debug.h"
 #endif
 
 #define GC_HEAP_GROW_FACTOR 2

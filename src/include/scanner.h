@@ -40,6 +40,7 @@ typedef enum {
     TOKEN_PRINT,
     TOKEN_RETURN,
     TOKEN_SUPER,
+    TOKEN_SWEAR,
     TOKEN_THIS,
     TOKEN_TRUE,
     TOKEN_VAR,

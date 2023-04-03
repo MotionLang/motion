@@ -1,7 +1,7 @@
-func fib(n) {
-    if (n < 2) return n;
+func fib(n) |
+    if (n < 2) | return n; end
     return fib(n- 2) + fib(n -1);
-}
+end
 
 var start = clock();
 print fib(33);
