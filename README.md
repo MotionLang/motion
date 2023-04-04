@@ -24,8 +24,7 @@ func add(a, b) |
 	var new = (a + b);
 	print new;
 	return new;
-end
-
+|!
 ```
 
 For more examples, see ```/examples```
