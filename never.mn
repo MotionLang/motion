@@ -1,0 +1,9 @@
+func printTimes(item, times) |
+    var x = 0;
+    while(x != times) |
+        print item;
+        x = x+1;
+    |!
+|!
+
+printTimes("No!", 100);

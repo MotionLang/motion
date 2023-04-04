@@ -220,7 +220,7 @@ Token scanToken() {
         case '}':
             return makeToken(TOKEN_RIGHT_BRACE);
         case '|':
-            return makeToken(TOKEN_LEFT_BRACE);
+            return makeToken(match('!') ? TOKEN_RIGHT_BRACE : TOKEN_LEFT_BRACE);
         case ';':
             return makeToken(TOKEN_SEMICOLON);
         // Add replacement for newline with semicolon

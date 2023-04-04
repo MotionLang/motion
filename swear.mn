@@ -3,6 +3,6 @@ func noThree(a, b) |
 
     swear(x != 3);
     return x;
-end
+|!
 
 print noThree(2, 2);

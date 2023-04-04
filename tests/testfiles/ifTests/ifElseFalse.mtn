@@ -1,7 +1,7 @@
 var x = 10;
 
-if (x == 100) {
+if (x == 100) |
     print "if";
-} else {
+end else |
     print "else";
-}
+end
