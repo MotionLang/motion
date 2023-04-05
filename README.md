@@ -20,11 +20,11 @@ var y = 10; var z = 2;
 
 print x * y;
 
-func add(a, b) |
+func add(a, b) do
 	var new = (a + b);
 	print new;
 	return new;
-|!
+end
 ```
 
 For more examples, see ```/examples```
