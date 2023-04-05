@@ -9,7 +9,7 @@
 #include "/workspaces/motion/src/include/vm.h"
 
 static void repl() {
-    printf("Motion v0.05\n");
+    printf("Motion v0.0.5\n");
     printf("Ctrl-C to Exit\n");
     printf("\n");
     char line[1024];
