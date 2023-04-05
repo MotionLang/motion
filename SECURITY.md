@@ -12,4 +12,4 @@ currently being supported with security updates.
 ## Reporting a Vulnerability
 
 If the vulnerability is not severe, create a Github issue.
-If the vulnerability is widespread, create an advisory.
+If the vulnerability is widespread, or otherwise dangerous, create a security advisory.

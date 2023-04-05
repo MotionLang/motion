@@ -25,7 +25,6 @@ func add(a, b) |
 	print new;
 	return new;
 |!
-
 ```
 
 For more examples, see ```/examples```

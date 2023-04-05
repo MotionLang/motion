@@ -108,8 +108,17 @@ static TokenType identifierType() {
             return checkKeyword(1, 2, "nd:", TOKEN_AND);
         case 'c':
             return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+        case 'd':
+            return checkKeyword(1, 1, "o", TOKEN_OPEN_BLOCK);
         case 'e':
-            return checkKeyword(1, 3, "lse", TOKEN_ELSE);
+            if (scanner.current - scanner.start > 1) {
+                switch (scanner.start[1]) {
+                    case 'l':
+                        return checkKeyword(2, 2, "se", TOKEN_ELSE);
+                    case 'n':
+                        return checkKeyword(2, 1, "d", TOKEN_CLOSE_BLOCK);
+                }
+            }
         case 'f':
             if (scanner.current - scanner.start > 1) {
                 switch (scanner.start[1]) {
@@ -133,7 +142,12 @@ static TokenType identifierType() {
         case 'r':
             return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
         case 's':
-            return checkKeyword(1, 4, "uper", TOKEN_SUPER);
+            if (scanner.current - scanner.start > 1) {
+                switch (scanner.start[1]) {
+                    case 'u':
+                        return checkKeyword(2, 3, "per", TOKEN_SUPER);
+                }
+            }
         case 't':
             if (scanner.current - scanner.start > 1) {
                 switch (scanner.start[1]) {
@@ -201,9 +215,11 @@ Token scanToken() {
         case ')':
             return makeToken(TOKEN_RIGHT_PAREN);
         case '{':
-            return makeToken(TOKEN_LEFT_BRACE);
+            return makeToken(TOKEN_OPEN_BLOCK);
         case '}':
-            return makeToken(TOKEN_RIGHT_BRACE);
+            return makeToken(TOKEN_CLOSE_BLOCK);
+        case '|':
+            return makeToken(match('!') ? TOKEN_CLOSE_BLOCK : TOKEN_OPEN_BLOCK);
         case ';':
             return makeToken(TOKEN_SEMICOLON);
         // Add replacement for newline with semicolon
@@ -230,6 +246,5 @@ Token scanToken() {
         case '"':
             return string();
     }
-
     return errorToken("BadCharErr");
 }

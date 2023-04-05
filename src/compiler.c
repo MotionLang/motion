@@ -53,10 +53,7 @@ typedef struct {
     bool isLocal;
 } Upvalue;
 
-typedef enum {
-    TYPE_FUNCTION,
-    TYPE_SCRIPT
-} FunctionType;
+typedef enum { TYPE_FUNCTION, TYPE_SCRIPT } FunctionType;
 
 typedef struct Compiler {
     struct Compiler* enclosing;
@@ -79,18 +76,20 @@ static Chunk* currentChunk() { return &current->function->chunk; }
 static void errorAt(Token* token, const char* message) {
     if (parser.panicMode) return;
     parser.panicMode = true;
-    fprintf(stderr, "[line %d] Err", token->line);
+    fprintf(stderr, ANSI_COLOR_RED "[line %d] Err", token->line);
 
     if (token->type == TOKEN_EOF) {
-        fprintf(stderr, " at end");
+        fprintf(stderr, ANSI_COLOR_RED " at end");
     } else if (token->type == TOKEN_ERROR) {
         // Nothing.
     } else {
-        fprintf(stderr, " at '%.*s'", token->length, token->start);
+        fprintf(stderr, ANSI_COLOR_RED " at '%.*s'", token->length,
+                token->start);
     }
 
-    fprintf(stderr, ": %s\n", message);
+    fprintf(stderr, ANSI_COLOR_RED ": %s\n", message);
     parser.hadError = true;
+    printf(ANSI_COLOR_RESET);
 }
 
 static void error(const char* message) { errorAt(&parser.previous, message); }
@@ -230,7 +229,7 @@ static void endScope() {
     while (current->localCount > 0 &&
            current->locals[current->localCount - 1].depth >
                current->scopeDepth) {
-        if(current->locals[current->localCount - 1].isCaptured) {
+        if (current->locals[current->localCount - 1].isCaptured) {
             emitByte(OP_CLOSE_UPVALUE);
         } else {
             emitByte(OP_POP);
@@ -271,7 +270,7 @@ static int resolveLocal(Compiler* compiler, Token* name) {
 static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal) {
     int upvalueCount = compiler->function->upvalueCount;
 
-    for (int i = 0; i < upvalueCount; i++){
+    for (int i = 0; i < upvalueCount; i++) {
         Upvalue* upvalue = &compiler->upvalues[i];
         if (upvalue->index == index && upvalue->isLocal == isLocal) {
             return i;
@@ -527,8 +526,8 @@ static void unary(bool canAssign) {
 ParseRule rules[] = {
     [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
-    [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_OPEN_BLOCK] = {NULL, NULL, PREC_NONE},
+    [TOKEN_CLOSE_BLOCK] = {NULL, NULL, PREC_NONE},
     [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
     [TOKEN_DOT] = {NULL, NULL, PREC_NONE},
     [TOKEN_MINUS] = {unary, binary, PREC_TERM},
@@ -593,11 +592,11 @@ static ParseRule* getRule(TokenType type) { return &rules[type]; }
 static void expression() { parsePrecedence(PREC_ASSIGNMENT); }
 
 static void block() {
-    while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
+    while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
         declaration();
     }
 
-    consume(TOKEN_RIGHT_BRACE, "Expected '}' after block.");
+    consume(TOKEN_CLOSE_BLOCK, "Expected keyword 'end' after block.");
 }
 
 static void function(FunctionType type) {
@@ -617,7 +616,7 @@ static void function(FunctionType type) {
         } while (match(TOKEN_COMMA));
     }
     consume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_LEFT_BRACE, "Expected '{' before function body");
+    consume(TOKEN_OPEN_BLOCK, "Expected a '|' before function body");
     block();
 
     ObjFunction* function = endCompiler();
@@ -644,8 +643,7 @@ static void varDeclaration() {
     } else {
         emitByte(OP_NIL);
     }
-    consume(TOKEN_SEMICOLON,
-            "Expected ';' or newline after variable declaration.");
+    consume(TOKEN_SEMICOLON, "Expected ';' after variable declaration.");
 
     defineVariable(global);
 }
@@ -683,7 +681,7 @@ static void forStatement() {
         int incrementStart = currentChunk()->count;
         expression();
         emitByte(OP_POP);
-        consume(TOKEN_RIGHT_PAREN, "Expected ')' after for clause");
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' after 'for' clause");
 
         emitLoop(loopStart);
         loopStart = incrementStart;
@@ -702,7 +700,7 @@ static void forStatement() {
 }
 
 static void ifStatement() {
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'if')");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'if')");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
 
@@ -744,7 +742,7 @@ static void returnStatement() {
 
 static void whileStatement() {
     int loopStart = currentChunk()->count;
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'while'");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'while'");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
 
@@ -804,7 +802,7 @@ static void statement() {
         returnStatement();
     } else if (match(TOKEN_WHILE)) {
         whileStatement();
-    } else if (match(TOKEN_LEFT_BRACE)) {
+    } else if (match(TOKEN_OPEN_BLOCK)) {
         beginScope();
         block();
         endScope();
@@ -831,9 +829,9 @@ ObjFunction* compile(const char* source) {
     return parser.hadError ? NULL : function;
 }
 
-void markCompilerRoots() { 
-    Compiler* compiler = current; 
-    while(compiler != NULL) {
+void markCompilerRoots() {
+    Compiler* compiler = current;
+    while (compiler != NULL) {
         markObject((Obj*)compiler->function);
         compiler = compiler->enclosing;
     }

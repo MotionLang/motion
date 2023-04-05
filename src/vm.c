@@ -28,7 +28,7 @@ static void runtimeError(const char* format, ...) {
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
-    fputs("\n", stderr);
+    fputs(ANSI_COLOR_RED "\n", stderr);
 
     for (int i = vm.frameCount - 1; i >= 0; i--) {
         CallFrame* frame = &vm.frames[i];
@@ -46,6 +46,7 @@ static void runtimeError(const char* format, ...) {
     size_t instruction = frame->ip - frame->closure->function->chunk.code - 1;
     int line = frame->closure->function->chunk.lines[instruction];
     fprintf(stderr, "[line %d] in script\n", line);
+    printf(ANSI_COLOR_RESET);
     resetStack();
 }
 
@@ -113,13 +114,14 @@ static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
 
 static bool call(ObjClosure* closure, int argCount) {
     if (argCount != closure->function->arity) {
-        runtimeError("Expected %d arguments but received %d",
+        runtimeError(ANSI_COLOR_RED "Expected %d arguments but received %d",
                      closure->function->arity, argCount);
         return false;
     }
 
     if (vm.frameCount == FRAMES_MAX) {
-        runtimeError("Stack overflow. You may have recursive code.");
+        runtimeError(ANSI_COLOR_RED
+                     "Stack overflow. You may have recursive code.");
         return false;
     }
 
@@ -272,7 +274,7 @@ static InterpretResult run() {
                 ObjString* name = READ_STRING();
                 Value value;
                 if (!tableGet(&vm.globals, name, &value)) {
-                    runtimeError("Undefined variable '%s'.", name->chars);
+                    runtimeError(ANSI_COLOR_RED "Undefined variable '%s'.", name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(value);
