@@ -2,8 +2,8 @@ var x = 11;
 
 ## comment
 
-if (x == 10) |
+if (x == 10) do
     print "If condition";
-end else |
+end else do
     print "Else Condition";
 end

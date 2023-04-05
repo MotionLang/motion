@@ -5,8 +5,8 @@ typedef enum {
     // Single char tokens
     TOKEN_LEFT_PAREN,
     TOKEN_RIGHT_PAREN,
-    TOKEN_LEFT_BRACE,
-    TOKEN_RIGHT_BRACE,
+    TOKEN_OPEN_BLOCK,
+    TOKEN_CLOSE_BLOCK,
     TOKEN_COMMA,
     TOKEN_DOT,
     TOKEN_MINUS,
@@ -40,7 +40,6 @@ typedef enum {
     TOKEN_PRINT,
     TOKEN_RETURN,
     TOKEN_SUPER,
-    TOKEN_SWEAR,
     TOKEN_THIS,
     TOKEN_TRUE,
     TOKEN_VAR,

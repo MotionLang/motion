@@ -16,4 +16,10 @@
 // Except for this.
 #define UINT8_COUNT (UINT8_MAX + 1)
 
+#define ANSI_COLOR_BLACK "\e[0;30m"
+#define ANSI_COLOR_RED "\e[0;31m"
+#define ANSI_COLOR_YELLOW "\e[0;33m"
+#define ANSI_COLOR_GREEN "\e[0;32m"
+#define ANSI_COLOR_RESET "\e[0m"
+
 #endif
