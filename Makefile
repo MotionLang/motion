@@ -11,7 +11,6 @@ all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 	mv $(OBJS) src/obj
 	mv $(OUT) bin
-	export PATH=${PATH}:/workspaces/motion/bin
 	clear
 
 main.o: main.c
@@ -49,6 +48,9 @@ clean:
 	rm -fvr $(OBJDIR)
 	rm -fv bin/$(OUT)
 	mkdir src/obj
+
+exp:
+	export PATH=${PATH}:/workspaces/motion/bin
 
 vgm:
 	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -v bin/motion
