@@ -628,6 +628,18 @@ static void function(FunctionType type) {
     }
 }
 
+static void classDeclaration() {
+    consume(TOKEN_IDENTIFIER, "Expected a class name");
+    uint8_t nameConstant = identifierConstant(&parser.previous);
+    declareVariable();
+
+    emitBytes(OP_CLASS, nameConstant);
+    defineVariable(nameConstant);
+
+    consume(TOKEN_OPEN_BLOCK, "Expected keyword 'do' before class body");
+    consume(TOKEN_CLOSE_BLOCK, "Expected keyword 'end' after class body");
+}
+
 static void funcDeclaration() {
     uint8_t global = parseVariable("Expected Function Name");
     markInitialized();
@@ -778,7 +790,9 @@ static void synchronize() {
 }
 
 static void declaration() {
-    if (match(TOKEN_FUNC)) {
+    if (match(TOKEN_CLASS)){
+        classDeclaration();
+    }else if (match(TOKEN_FUNC)) {
         funcDeclaration();
     } else if (match(TOKEN_VAR)) {
         varDeclaration();

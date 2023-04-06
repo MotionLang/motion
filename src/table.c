@@ -5,7 +5,6 @@
 
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/memory.h"
-#include "/workspaces/motion/src/include/object.h"
 #include "/workspaces/motion/src/include/value.h"
 
 #define TABLE_MAX_LOAD 0.75

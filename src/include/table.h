@@ -2,7 +2,6 @@
 #define clox_table_h
 
 #include "/workspaces/motion/src/include/common.h"
-#include "/workspaces/motion/src/include/object.h"
 #include "/workspaces/motion/src/include/value.h"
 
 typedef struct {
