@@ -77,6 +77,7 @@ static void skipWhitespace() {
                 scanner.line++;
                 advance();
                 break;
+                
             // Comments; they look like ##
             case '#':
                 if (peekNext() == '#') {
@@ -108,15 +109,11 @@ static TokenType identifierType() {
             return checkKeyword(1, 2, "nd:", TOKEN_AND);
         case 'c':
             return checkKeyword(1, 4, "lass", TOKEN_CLASS);
-        case 'd':
-            return checkKeyword(1, 1, "o", TOKEN_OPEN_BLOCK);
         case 'e':
             if (scanner.current - scanner.start > 1) {
                 switch (scanner.start[1]) {
                     case 'l':
                         return checkKeyword(2, 2, "se", TOKEN_ELSE);
-                    case 'n':
-                        return checkKeyword(2, 1, "d", TOKEN_CLOSE_BLOCK);
                 }
             }
         case 'f':
@@ -218,8 +215,6 @@ Token scanToken() {
             return makeToken(TOKEN_OPEN_BLOCK);
         case '}':
             return makeToken(TOKEN_CLOSE_BLOCK);
-        case '|':
-            return makeToken(match('!') ? TOKEN_CLOSE_BLOCK : TOKEN_OPEN_BLOCK);
         case ';':
             return makeToken(TOKEN_SEMICOLON);
         // Add replacement for newline with semicolon

@@ -1,8 +1,14 @@
-func main() do
-    diff();
-    print "this works";
-end
+func hashString(key, length) {
+    var hash = 216636261;
+    for(var i = 0; i < length; i = i + 1) {
+        hash = key*i;
+        hash = hash * 16777619;
+    }
+    print hash;
+    return hash;
+}
 
-func diff() do
-    print("1");
-end
+func main(){
+    print(hash("asdf", 10));
+}
+

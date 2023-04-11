@@ -8,7 +8,7 @@
 // Debugging commands.
 // Comment these out for release or tests
 //#define DEBUG_PRINT_CODE
-//#define DEBUG_TRACE_EXECUTION
+#define DEBUG_TRACE_EXECUTION
 
 //#define DEBUG_STRESS_GC
 //#define DEBUG_LOG_GC
@@ -20,6 +20,7 @@
 #define ANSI_COLOR_RED "\e[0;31m"
 #define ANSI_COLOR_YELLOW "\e[0;33m"
 #define ANSI_COLOR_GREEN "\e[0;32m"
+#define ANSI_COLOR_BLUE "\e[0;34m"
 #define ANSI_COLOR_RESET "\e[0m"
 
 #endif

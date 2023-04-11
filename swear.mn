@@ -1,8 +1,8 @@
-func noThree(a, b) |
-    var x = a + b;
+class Scone {
+  topping(first, second) {
+    print "scone with " + first + " and " + second;
+  }
+}
 
-    swear(x != 3)
-    return x;
-|!
-
-print noThree(2, 1);
+var scone = Scone();
+scone.topping("berries", "cream");

@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -12,10 +13,14 @@
 #include "/workspaces/motion/src/include/object.h"
 
 VM vm;
+
+int system(const char* command);
+
 // Native Function Declarations
 static Value clockNative(int argCount, Value* args) {
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
+
 
 static void resetStack() {
     vm.stackTop = vm.stack;
@@ -135,6 +140,10 @@ static bool call(ObjClosure* closure, int argCount) {
 static bool callValue(Value callee, int argCount) {
     if (IS_OBJ(callee)) {
         switch (OBJ_TYPE(callee)) {
+            case OBJ_BOUND_METHOD: {
+                ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+                return call(bound->method, argCount);
+            }
             case OBJ_CLASS: {
                 ObjClass* klass = AS_CLASS(callee);
                 vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(klass));
@@ -155,6 +164,19 @@ static bool callValue(Value callee, int argCount) {
     }
     runtimeError("Cannot call an object that is not a function or class");
     return false;
+}
+
+static bool bindMethod(ObjClass* klass, ObjString* name) { 
+    Value method;
+    if (!tableGet(&klass->methods, name, &method)) {
+        runtimeError("Undefined property '%s'", name->chars);
+        return false;
+    }
+
+    ObjBoundMethod* bound = newBoundMethod(peek(0), AS_CLOSURE(method));
+    pop();
+    push(OBJ_VAL(bound));
+    return true;
 }
 
 static ObjUpvalue* captureUpvalue(Value* local) {
@@ -188,6 +210,13 @@ static void closeUpvalues(Value* last) {
         upvalue->location = &upvalue->closed;
         vm.openUpvalues = upvalue->next;
     }
+}
+
+static void defineMethod(ObjString* name) {
+    Value method = peek(0);
+    ObjClass* klass = AS_CLASS(peek(1));
+    tableSet(&klass->methods, name, method);
+    pop();
 }
 
 static bool isFalsey(Value value) {
@@ -325,6 +354,11 @@ static InterpretResult run() {
                     break;
                 }
 
+                if (!bindMethod(instance->klass, name)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+
                 runtimeError("Undefined property '%s", name->chars);
                 return INTERPRET_RUNTIME_ERROR;
             }
@@ -455,6 +489,10 @@ static InterpretResult run() {
             }
             case OP_CLASS: {
                 push(OBJ_VAL(newClass(READ_STRING())));
+                break;
+            }
+            case OP_METHOD: {
+                defineMethod(READ_STRING());
                 break;
             }
         }

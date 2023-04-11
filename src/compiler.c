@@ -608,7 +608,7 @@ static void block() {
         declaration();
     }
 
-    consume(TOKEN_CLOSE_BLOCK, "Expected keyword 'end' after block.");
+    consume(TOKEN_CLOSE_BLOCK, "Expected keyword '}' after block.");
 }
 
 static void function(FunctionType type) {
@@ -628,7 +628,7 @@ static void function(FunctionType type) {
         } while (match(TOKEN_COMMA));
     }
     consume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_OPEN_BLOCK, "Expected a '|' before function body");
+    consume(TOKEN_OPEN_BLOCK, "Expected a '{' before function body");
     block();
 
     ObjFunction* function = endCompiler();
@@ -640,16 +640,31 @@ static void function(FunctionType type) {
     }
 }
 
+static void method() { 
+    consume(TOKEN_IDENTIFIER, "Expected a method name");
+    uint8_t constant = identifierConstant(&parser.previous);
+
+    FunctionType type = TYPE_FUNCTION;
+    function(type);
+    emitBytes(OP_METHOD, constant);
+}
+
 static void classDeclaration() {
     consume(TOKEN_IDENTIFIER, "Expected a class name");
+    Token className = parser.previous;
     uint8_t nameConstant = identifierConstant(&parser.previous);
     declareVariable();
 
     emitBytes(OP_CLASS, nameConstant);
     defineVariable(nameConstant);
 
-    consume(TOKEN_OPEN_BLOCK, "Expected keyword 'do' before class body");
-    consume(TOKEN_CLOSE_BLOCK, "Expected keyword 'end' after class body");
+    namedVariable(className, false);
+    consume(TOKEN_OPEN_BLOCK, "Expected '{' before class body");
+    while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
+        method();
+    }
+    consume(TOKEN_CLOSE_BLOCK, "Expected '}' after class body");
+    emitByte(OP_POP);
 }
 
 static void funcDeclaration() {
@@ -780,6 +795,9 @@ static void whileStatement() {
 }
 
 static void synchronize() {
+#ifdef DEBUG_TRACE_EXECUTION
+    printf(ANSI_COLOR_YELLOW "[COMPILER] [WARN] synchronizing\n" ANSI_COLOR_RESET);
+#endif
     parser.panicMode = false;
     while (parser.current.type != TOKEN_EOF) {
         if (parser.previous.type == TOKEN_SEMICOLON) return;
@@ -795,9 +813,11 @@ static void synchronize() {
                 return;
 
             default:;  // Do nothing
-        }
 
+        }
+        
         advance();
+
     }
 }
 

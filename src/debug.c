@@ -4,9 +4,10 @@
 
 #include "/workspaces/motion/src/include/object.h"
 #include "/workspaces/motion/src/include/value.h"
+#include "/workspaces/motion/src/include/common.h"
 
 void disassembleChunk(Chunk* chunk, const char* name) {
-    printf("== %s ==\n", name);
+    printf(ANSI_COLOR_GREEN "== %s ==\n" ANSI_COLOR_RESET, name);
 
     for (int offset = 0; offset < chunk->count;) {
         offset = disassembleInstruction(chunk, offset);
@@ -41,10 +42,10 @@ static int jumpInstruction(const char* name, int sign, Chunk* chunk,
 }
 
 int disassembleInstruction(Chunk* chunk, int offset) {
-    printf("%04d ", offset);
+    printf(ANSI_COLOR_BLUE "%04d " ANSI_COLOR_RESET, offset);
 
     if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
-        printf("   | ");
+        printf(ANSI_COLOR_GREEN "   | " ANSI_COLOR_RESET);
     } else {
         printf("%4d ", chunk->lines[offset]);
     }
@@ -130,6 +131,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
             return simpleInstruction("OP_RETURN", offset);
         case OP_CLASS:
             return constantInstruction("OP_CLASS", chunk, offset);
+        case OP_METHOD:
+            return constantInstruction("OP_METHOD", chunk, offset);
         default:
             printf("Unknown opcode %d\n", instruction);
             return offset + 1;
