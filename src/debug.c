@@ -23,7 +23,7 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset) {
 }
 
 static int simpleInstruction(const char* name, int offset) {
-    printf("%s\n", name);
+    printf("%s\n" , name);
     return offset + 1;
 }
 
@@ -42,7 +42,7 @@ static int jumpInstruction(const char* name, int sign, Chunk* chunk,
 }
 
 int disassembleInstruction(Chunk* chunk, int offset) {
-    printf(ANSI_COLOR_BLUE "%04d " ANSI_COLOR_RESET, offset);
+    printf(ANSI_COLOR_GREEN "%04d " ANSI_COLOR_RESET, offset);
 
     if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
         printf(ANSI_COLOR_GREEN "   | " ANSI_COLOR_RESET);

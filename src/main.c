@@ -5,6 +5,7 @@
 #include "/workspaces/motion/src/include/chunk.h"
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/debug.h"
+#include "/workspaces/motion/src/include/flags.h"
 #include "/workspaces/motion/src/include/memory.h"
 #include "/workspaces/motion/src/include/vm.h"
 
@@ -73,9 +74,11 @@ static void runFile(const char* path) {
 int main(int argc, const char* argv[]) {
     initVM();
 
+    FLAG_STRICT = false;
+
     if (argc == 1) {
         repl();
-    } else if (argc == 2) {
+    } else {
         if ((strcmp(argv[1], "-i") == 0) || (strcmp(argv[1], "--info") == 0)) {
             printf("Motion v0.0.5\n");
             printf("\n");
@@ -91,21 +94,21 @@ int main(int argc, const char* argv[]) {
             printf("--help / -h: This command\n");
             printf("--info / -i: Information about Motion\n");
             printf(
-                "--run / -r:  Run a file. The final argument is the path to the "
+                "--run / -r:  Run a file. The final argument is the path to "
+                "the "
                 "file you wish to execute\n");
 
+        } else if ((strcmp(argv[1], "--run")) || (strcmp(argv[1], "-r")) == 0) {
+            runFile(argv[2]);
+        } else if ((strcmp(argv[3], "--strict")) || (strcmp(argv[3], "-s")) == 0) {
+            FLAG_STRICT = true;
         } else {
-            fprintf(stderr, ANSI_COLOR_RED "motion: Invalid Command\n");
+            fprintf(stderr, ANSI_COLOR_RED "[MOTION] Invalid Command\n");
             printf(ANSI_COLOR_RESET);
         }
-    } else if (argc == 3) {
-        if ((strcmp(argv[1], "--run")) || (strcmp(argv[1], "-r")) == 0) {
-            runFile(argv[2]);
-        }
-
-    } else {
-        fprintf(stderr, "motion: Invalid Command");
     }
+        
+
 
     freeVM();
     return 0;

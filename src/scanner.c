@@ -5,11 +5,13 @@
 
 #include "/workspaces/motion/src/include/common.h"
 
+/*
 typedef struct {
     const char* start;
     const char* current;
     int line;
 } Scanner;
+*/
 
 Scanner scanner;
 

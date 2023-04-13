@@ -18,6 +18,7 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c",
-        "object.h": "c"
+        "object.h": "c",
+        "errors.h": "c"
     }
 }

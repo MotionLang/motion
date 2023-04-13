@@ -9,6 +9,7 @@
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/compiler.h"
 #include "/workspaces/motion/src/include/debug.h"
+#include "/workspaces/motion/src/include/errors.h"
 #include "/workspaces/motion/src/include/memory.h"
 #include "/workspaces/motion/src/include/object.h"
 
@@ -29,29 +30,37 @@ static void resetStack() {
 }
 
 static void runtimeError(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    fputs(ANSI_COLOR_RED "\n", stderr);
 
     for (int i = vm.frameCount - 1; i >= 0; i--) {
         CallFrame* frame = &vm.frames[i];
         ObjFunction* function = frame->closure->function;
         size_t instruction = frame->ip - function->chunk.code - 1;
-        fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+        fprintf(stderr, ANSI_COLOR_RED  "[line %d] [RUNTIME] " ANSI_COLOR_RESET,
+                function->chunk.lines[instruction]);
+
         if (function->name == NULL) {
-            fprintf(stderr, "script\n");
+            fprintf(stderr, ANSI_COLOR_RED "Error in script: " ANSI_COLOR_RESET);
         } else {
-            fprintf(stderr, "%s()\n", function->name->chars);
+            fprintf(stderr, ANSI_COLOR_RED "Error in %s(): " ANSI_COLOR_RESET, function->name->chars);
         }
+        va_list args;
+        va_start(args, format);
+        vfprintf(stderr, format, args);
+        va_end(args);
+        fputs(ANSI_COLOR_RED "\n", stderr);
     }
+
+
 
     CallFrame* frame = &vm.frames[vm.frameCount - 1];
     size_t instruction = frame->ip - frame->closure->function->chunk.code - 1;
     int line = frame->closure->function->chunk.lines[instruction];
-    fprintf(stderr, "[line %d] in script\n", line);
+    // Not sure why this is here, works fine without it.
+    // fprintf(stderr, "[line %d] in script\n", line);
     printf(ANSI_COLOR_RESET);
+#ifdef DEBUG_TRACE_EXECUTION
+    printf(ANSI_COLOR_BLUE "[VM] [INFO] Resetting Stack \n" ANSI_COLOR_RESET);
+#endif
     resetStack();
 }
 
@@ -119,7 +128,8 @@ static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
 
 static bool call(ObjClosure* closure, int argCount) {
     if (argCount != closure->function->arity) {
-        runtimeError(ANSI_COLOR_RED "Expected %d arguments but received %d",
+        runtimeError(ANSI_COLOR_RED
+                     "Expected %d arguments but received %d",
                      closure->function->arity, argCount);
         return false;
     }
@@ -162,7 +172,8 @@ static bool callValue(Value callee, int argCount) {
                 break;  // Non-Callable object type
         }
     }
-    runtimeError("Cannot call an object that is not a function or class");
+    runtimeError(
+        "Cannot call an object that is not a function or class");
     return false;
 }
 
@@ -254,7 +265,7 @@ static InterpretResult run() {
 #define BINARY_OP(valueType, op)                          \
     do {                                                  \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
-            runtimeError("Invalid Operands");             \
+            runtimeError("Invalid Operands");    \
             return INTERPRET_RUNTIME_ERROR;               \
         }                                                 \
         double b = AS_NUMBER(pop());                      \
@@ -308,7 +319,9 @@ static InterpretResult run() {
                 ObjString* name = READ_STRING();
                 Value value;
                 if (!tableGet(&vm.globals, name, &value)) {
-                    runtimeError(ANSI_COLOR_RED "Undefined variable '%s'.", name->chars);
+                    runtimeError(ANSI_COLOR_RED
+                                 "Undefined variable '%s'.",
+                                 name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(value);
@@ -324,7 +337,8 @@ static InterpretResult run() {
                 ObjString* name = READ_STRING();
                 if (tableSet(&vm.globals, name, peek(0))) {
                     tableDelete(&vm.globals, name);
-                    runtimeError("Undefined variable '%s'.", name->chars);
+                    runtimeError("Undefined variable '%s'.",
+                                 name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 break;
@@ -397,7 +411,7 @@ static InterpretResult run() {
                     push(NUMBER_VAL(a + b));
                 } else {
                     runtimeError(
-                        "InvalidOperandErr: Operands must be two numbers or "
+                        "Operands must be two numbers or "
                         "two strings");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -417,7 +431,7 @@ static InterpretResult run() {
                 break;
             case OP_NEGATE:
                 if (!IS_NUMBER(peek(0))) {
-                    runtimeError("InvalidOperatorErr");
+                    runtimeError("Invalid Operands");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(NUMBER_VAL(-AS_NUMBER(pop())));

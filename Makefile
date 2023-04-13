@@ -1,6 +1,6 @@
-OBJS	= main.o chunk.o compiler.o debug.o memory.o object.o scanner.o table.o value.o vm.o
-SOURCE	= main.c chunk.c compiler.c debug.c memory.c object.c scanner.c table.c value.c vm.c
-HEADER	= common.h chunk.h compiler.h debug.h memory.h object.h scanner.h table.h value.h vm.h
+OBJS	= main.o chunk.o compiler.o debug.o errors.o memory.o object.o scanner.o table.o value.o vm.o
+SOURCE	= main.c chunk.c compiler.c debug.c errors.c memory.c object.c scanner.c table.c value.c vm.c
+HEADER	= common.h chunk.h compiler.h debug.h errors.h memory.h object.h scanner.h table.h value.h vm.h
 OUT	= motion
 CC	 = gcc
 FLAGS	 = -g -c -Wall
@@ -26,6 +26,9 @@ compiler.o: compiler.c
 debug.o: debug.c
 	$(CC) $(FLAGS) src/debug.c -std=c99
 
+errors.o: errors.c
+	$(CC) $(FLAGS) src/errors.c -std=c99
+
 memory.o: memory.c
 	$(CC) $(FLAGS) src/memory.c -std=c99
 
@@ -50,10 +53,16 @@ clean:
 	rm -fv bin/$(OUT)
 	mkdir src/obj
 
-exp:##
+fclean:
+	rm -fvr *.o
+exp:
+	export PATH=$PATH:/workspaces/motion/bin
 
 vgm:
 	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -v bin/motion
+
+vgmq:
+	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -q bin/motion
 
 vgh:
 	valgrind --tool=helgrind -v bin/motion
