@@ -76,7 +76,6 @@ typedef struct Compiler {
 
 } Compiler;
 
-/// @brief Global Variable initializations
 Parser parser;
 Compiler* current = NULL;
 Chunk* compilingChunk;
@@ -106,16 +105,16 @@ static void errorAt(Token* token, const char* message) {
     fprintf(stderr, ANSI_COLOR_RED ": %s\n", message);
     parser.hadError = true;
     printf(ANSI_COLOR_RESET);
-    switch(parser.previous.type) {
-        case TOKEN_EOF: {
-            printf("%d|%s", (parser.current.line) - 1,
-                   stringWithArrows(parser.current.start, 0,
-                                    parser.previous.length));
-        }
-        default:
-            return;
-    }
+    /* FIXME: This code should display a "snippet" of the erroneous code. However, it doesn't work.
+       The contents of the parser are unpredictable, I don't know what to do. Comment out for now.
+
+    const char* contents = parser.previous.start;
+    printf(
+        "%d | %s %c\n", (parser.current.line) - 1,
+        stringWithArrows(contents, 3, strlen(contents)));
+        */
 }
+
 
 /// @brief Wrapper for the errorAt function.
 /// @param message A message to be displayed.
@@ -154,7 +153,7 @@ static void warnAt(Token* token, const char* message) {
     }
 }
 
-//static void warn(const char* message) { warnAt(&parser.previous, message); }
+// static void warn(const char* message) { warnAt(&parser.previous, message); }
 
 /// @brief A wrapper for the warnAt function
 /// @param message A message to be displayed.
@@ -162,7 +161,8 @@ static void warnAtCurrent(const char* message) {
     warnAt(&parser.current, message);
 }
 
-/// @brief Advances the current token in the parser by setting the previous token to the current one, and scanning for new tokens.
+/// @brief Advances the current token in the parser by setting the previous
+/// token to the current one, and scanning for new tokens.
 static void advance() {
     parser.previous = parser.current;
 
@@ -173,9 +173,10 @@ static void advance() {
         errorAtCurrent(parser.current.start);
     }
 }
-/// @brief Consumes the next token. If the token recieved differs from the one requested, it returns an error.
+/// @brief Consumes the next token. If the token recieved differs from the one
+/// requested, it returns an error.
 /// @param type Expected token type.
-/// @param message Message to be displayed 
+/// @param message Message to be displayed
 static void consume(TokenType type, const char* message) {
     if (parser.current.type == type) {
         advance();
@@ -185,8 +186,8 @@ static void consume(TokenType type, const char* message) {
     errorAtCurrent(message);
 }
 
-
-/// @brief Consumes the next token. If the token recieved differs from the one requested it returns a warning.
+/// @brief Consumes the next token. If the token recieved differs from the one
+/// requested it returns a warning.
 /// @param type Expected token type
 /// @param message Message to be displayed
 static void warnConsume(TokenType type, const char* message) {
@@ -197,12 +198,14 @@ static void warnConsume(TokenType type, const char* message) {
 
     warnAtCurrent(message);
 }
-/// @brief Returns a boolean representing if the current token in the parser matches the token provided.
+/// @brief Returns a boolean representing if the current token in the parser
+/// matches the token provided.
 /// @param type TokenType
 /// @return Bool
 static bool check(TokenType type) { return parser.current.type == type; }
 
-/// @brief Returns a boolean representing if the current token in the parser matches the token provided, then advances if true.
+/// @brief Returns a boolean representing if the current token in the parser
+/// matches the token provided, then advances if true.
 /// @param type TokenType
 /// @return Bool
 static bool match(TokenType type) {
@@ -212,7 +215,7 @@ static bool match(TokenType type) {
 }
 
 /// @brief Writes a single bytecode instruction to the current chunk.
-/// @param byte 
+/// @param byte
 static void emitByte(uint8_t byte) {
     writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -240,7 +243,7 @@ static void emitLoop(int loopStart) {
 }
 
 /// @brief Emits a jump instruction to jump to a bytecode instruction
-/// @param instruction A Bytecode Instruction 
+/// @param instruction A Bytecode Instruction
 /// @return The current chunk's count - 2.
 static int emitJump(uint8_t instruction) {
     emitByte(instruction);
@@ -387,7 +390,8 @@ static int resolveLocal(Compiler* compiler, Token* name) {
 /// @param compiler Compiler holding the closure
 /// @param index Index of the upvalue
 /// @param isLocal Is the upvalue a local?
-/// @return Either returns the upvalue count, unless the number of closure variables exceeds 255
+/// @return Either returns the upvalue count, unless the number of closure
+/// variables exceeds 255
 static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal) {
     int upvalueCount = compiler->function->upvalueCount;
 
@@ -411,8 +415,8 @@ static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal) {
 
 /// @brief Resolves an upvalue
 /// @param compiler The compiler containing the upvalue
-/// @param name 
-/// @return 
+/// @param name
+/// @return
 static int resolveUpvalue(Compiler* compiler, Token* name) {
     if (compiler->enclosing == NULL) return -1;
 
@@ -457,7 +461,8 @@ static void declareVariable() {
 
         if (identifiersEqual(name, &local->name)) {
             error(
-                "A variable with this name already exists within this scope [CE001]");
+                "A variable with this name already exists within this scope "
+                "[CE001]");
         }
     }
     addLocal(*name);
@@ -734,7 +739,7 @@ static void block() {
         declaration();
     }
 
-    warnConsume(TOKEN_CLOSE_BLOCK, "Expected a '}' after block.");
+    warnConsume(TOKEN_CLOSE_BLOCK, "A '}' is reccommended after a block.");
 }
 
 static void function(FunctionType type) {
@@ -754,7 +759,8 @@ static void function(FunctionType type) {
         } while (match(TOKEN_COMMA));
     }
     warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_OPEN_BLOCK, "Expected a '{' before function body");
+    consume(TOKEN_EQUAL, "Expected a '=>' before function body.");
+    warnConsume(TOKEN_OPEN_BLOCK, "A '{' is recommended before function body.");
     block();
 
     ObjFunction* function = endCompiler();
@@ -766,8 +772,8 @@ static void function(FunctionType type) {
     }
 }
 
-static void method() { 
-    consume(TOKEN_IDENTIFIER, "Expected a method name");
+static void method() {
+    consume(TOKEN_IDENTIFIER, "Expected a method name.");
     uint8_t constant = identifierConstant(&parser.previous);
 
     FunctionType type = TYPE_FUNCTION;
@@ -922,7 +928,8 @@ static void whileStatement() {
 
 static void synchronize() {
 #ifdef DEBUG_TRACE_EXECUTION
-    printf(ANSI_COLOR_BLUE "[COMPILER] [INFO] Syncing compiler \n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE
+           "[COMPILER] [INFO] Syncing compiler \n" ANSI_COLOR_RESET);
 #endif
     parser.panicMode = false;
     while (parser.current.type != TOKEN_EOF) {
@@ -939,18 +946,16 @@ static void synchronize() {
                 return;
 
             default:;  // Do nothing
-
         }
-        
-        advance();
 
+        advance();
     }
 }
 
 static void declaration() {
-    if (match(TOKEN_CLASS)){
+    if (match(TOKEN_CLASS)) {
         classDeclaration();
-    }else if (match(TOKEN_FUNC)) {
+    } else if (match(TOKEN_FUNC)) {
         funcDeclaration();
     } else if (match(TOKEN_VAR)) {
         varDeclaration();

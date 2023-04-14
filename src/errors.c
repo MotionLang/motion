@@ -58,7 +58,7 @@ char* stringWithArrows(const char* text, const int pos_start,
         for (int j = col_start; j < col_end; j++) {
             strcat(result, "^");
         }
-        strcat(result, "\n");
+        //strcat(result, "\n");
 
         // Update line_start
         line_start = line_end + 1;

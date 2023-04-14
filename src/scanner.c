@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "/workspaces/motion/src/include/common.h"
 
@@ -109,8 +110,8 @@ static TokenType identifierType() {
     switch (scanner.start[0]) {
         case 'a':
             return checkKeyword(1, 2, "nd:", TOKEN_AND);
-        case 'c':
-            return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+        case 'd':
+            return checkKeyword(1, 2, "ef", TOKEN_CLASS);
         case 'e':
             if (scanner.current - scanner.start > 1) {
                 switch (scanner.start[1]) {
@@ -235,7 +236,13 @@ Token scanToken() {
         case '!':
             return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=':
-            return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+            return makeToken(match('=')
+                                 ? TOKEN_EQUAL_EQUAL
+                                 : (match('>') 
+                                                ? TOKEN_EQUAL 
+                                                : TOKEN_EQUAL
+                                    )
+                            ); 
         case '<':
             return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>':
