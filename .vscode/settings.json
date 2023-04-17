@@ -26,6 +26,7 @@
         "new": "c",
         "sstream": "c",
         "stdexcept": "c",
-        "streambuf": "c"
+        "streambuf": "c",
+        "cstddef": "c"
     }
 }

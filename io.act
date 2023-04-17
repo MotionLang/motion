@@ -1,0 +1,18 @@
+## MODULE IO
+
+def IO => {
+    out(contents) => {
+        print(contents);
+    }
+
+    in(prompt) => {
+        print(prompt);
+        var input_cont => input();
+        return input_cont;
+    }
+
+    err(message, code) => {
+        print(message);
+        exit(code);
+    }  
+}

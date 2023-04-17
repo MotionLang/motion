@@ -6,4 +6,6 @@
 // Global Commands (Changed by CLI FLAGS)
 bool FLAG_STRICT;
 
+//#define FLAG_WRITE_BYTECODE
+
 #endif

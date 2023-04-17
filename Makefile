@@ -56,7 +56,7 @@ clean:
 fclean:
 	rm -fvr *.o
 exp:
-	export PATH=$PATH:/workspaces/motion/bin
+	export PATH=${PATH}:/workspaces/motion/bin/
 
 vgm:
 	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -v bin/motion

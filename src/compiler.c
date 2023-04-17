@@ -61,7 +61,12 @@ typedef struct {
 } Upvalue;
 
 /// @brief Enumeration of possible Function types.
-typedef enum { TYPE_FUNCTION, TYPE_SCRIPT } FunctionType;
+typedef enum {
+    TYPE_FUNCTION,
+    TYPE_INITIALIZER,
+    TYPE_METHOD,
+    TYPE_SCRIPT
+} FunctionType;
 
 /// @brief Struct for definition of the Compiler.
 typedef struct Compiler {
@@ -76,8 +81,13 @@ typedef struct Compiler {
 
 } Compiler;
 
+typedef struct ClassCompiler {
+    struct ClassCompiler* enclosing;
+} ClassCompiler;
+
 Parser parser;
 Compiler* current = NULL;
+ClassCompiler* currentClass = NULL;
 Chunk* compilingChunk;
 
 /// @brief Returns the current compilation chunk.
@@ -91,7 +101,7 @@ static void errorAt(Token* token, const char* message) {
     if (parser.panicMode) return;
     parser.panicMode = true;
     fprintf(stderr, ANSI_COLOR_RED "[line %d] [ERROR]    Error",
-            ((token->line) - 1));
+            ((token->line)));
 
     if (token->type == TOKEN_EOF) {
         fprintf(stderr, ANSI_COLOR_RED " at end");
@@ -105,8 +115,9 @@ static void errorAt(Token* token, const char* message) {
     fprintf(stderr, ANSI_COLOR_RED ": %s\n", message);
     parser.hadError = true;
     printf(ANSI_COLOR_RESET);
-    /* FIXME: This code should display a "snippet" of the erroneous code. However, it doesn't work.
-       The contents of the parser are unpredictable, I don't know what to do. Comment out for now.
+    /* FIXME: This code should display a "snippet" of the erroneous code.
+    However, it doesn't work. The contents of the parser are unpredictable, I
+    don't know what to do. Comment out for now.
 
     const char* contents = parser.previous.start;
     printf(
@@ -114,7 +125,6 @@ static void errorAt(Token* token, const char* message) {
         stringWithArrows(contents, 3, strlen(contents)));
         */
 }
-
 
 /// @brief Wrapper for the errorAt function.
 /// @param message A message to be displayed.
@@ -134,7 +144,7 @@ static void warnAt(Token* token, const char* message) {
         if (parser.panicMode) return;
         // parser.panicMode = true;
         fprintf(stderr, ANSI_COLOR_YELLOW "[line %d] [WARN]    Warning",
-                ((token->line) - 1));
+                ((token->line)));
 
         if (token->type == TOKEN_EOF) {
             fprintf(stderr, ANSI_COLOR_YELLOW " at end");
@@ -218,6 +228,13 @@ static bool match(TokenType type) {
 /// @param byte
 static void emitByte(uint8_t byte) {
     writeChunk(currentChunk(), byte, parser.previous.line);
+#ifdef FLAG_WRITE_BYTECODE
+    FILE* fptr;
+    char* charByte = byte;
+    fptr = fopen("log.mtn", "w+");
+    fprintf(fptr, charByte, "%u");
+    fclose(fptr);
+#endif
 }
 
 /// @brief Writes two bytecode instructions to the current chunk.
@@ -253,7 +270,12 @@ static int emitJump(uint8_t instruction) {
 }
 /// @brief Emits a return bytecode instruction.
 static void emitReturn() {
-    emitByte(OP_NIL);
+    if (current->type == TYPE_INITIALIZER) {
+        emitBytes(OP_GET_LOCAL, 0);
+    } else {
+        emitByte(OP_NIL);
+    }
+
     emitByte(OP_RETURN);
 }
 /// @brief Crates a constant and adds it to the current chunk.
@@ -309,8 +331,13 @@ static void initCompiler(Compiler* compiler, FunctionType type) {
     Local* local = &current->locals[current->localCount++];
     local->depth = 0;
     local->isCaptured = false;
-    local->name.start = "";
-    local->name.length = 0;
+    if (type != TYPE_FUNCTION) {
+        local->name.start = "this";
+        local->name.length = 4;
+    } else {
+        local->name.start = "";
+        local->name.length = 0;
+    }
 }
 
 /// @brief End or stop a compiler.
@@ -572,6 +599,10 @@ static void dot(bool canAssign) {
     if (canAssign && match(TOKEN_EQUAL)) {
         expression();
         emitBytes(OP_SET_PROPERTY, name);
+    } else if(match(TOKEN_LEFT_PAREN)) {
+        uint8_t argCount = argumentList();
+        emitBytes(OP_INVOKE, name);
+        emitByte(argCount);
     } else {
         emitBytes(OP_GET_PROPERTY, name);
     }
@@ -647,6 +678,15 @@ static void variable(bool canAssign) {
     namedVariable(parser.previous, canAssign);
 }
 
+static void this_(bool canAssign) {
+    if (currentClass == NULL) {
+        error("Cannot use keyword 'this' outside of a class");
+        return;
+    }
+
+    variable(false);
+}
+
 static void unary(bool canAssign) {
     TokenType operatorType = parser.previous.type;
 
@@ -700,7 +740,7 @@ ParseRule rules[] = {
     [TOKEN_OR] = {NULL, or_, PREC_NONE},
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
-    [TOKEN_THIS] = {NULL, NULL, PREC_NONE},
+    [TOKEN_THIS] = {this_, NULL, PREC_NONE},
     [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
     [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
     [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
@@ -776,7 +816,12 @@ static void method() {
     consume(TOKEN_IDENTIFIER, "Expected a method name.");
     uint8_t constant = identifierConstant(&parser.previous);
 
-    FunctionType type = TYPE_FUNCTION;
+    FunctionType type = TYPE_METHOD;
+    if (parser.previous.length == 4 &&
+        memcmp(parser.previous.start, "init", 4) == 0) {
+        type = TYPE_INITIALIZER;
+    }
+
     function(type);
     emitBytes(OP_METHOD, constant);
 }
@@ -790,13 +835,20 @@ static void classDeclaration() {
     emitBytes(OP_CLASS, nameConstant);
     defineVariable(nameConstant);
 
+    ClassCompiler classCompiler;
+    classCompiler.enclosing = currentClass;
+    currentClass = &classCompiler;
+
     namedVariable(className, false);
-    consume(TOKEN_OPEN_BLOCK, "Expected '{' before class body");
+    consume(TOKEN_EQUAL, "Expected a '=>' before class body");
+    warnConsume(TOKEN_OPEN_BLOCK, "Expected a '{' before class body");
     while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
         method();
     }
-    consume(TOKEN_CLOSE_BLOCK, "Expected '}' after class body");
+    warnConsume(TOKEN_CLOSE_BLOCK, "Expected '}' after class body");
     emitByte(OP_POP);
+
+    currentClass = currentClass->enclosing;
 }
 
 static void funcDeclaration() {
@@ -905,6 +957,9 @@ static void returnStatement() {
     if (match(TOKEN_SEMICOLON)) {
         emitReturn();
     } else {
+        if (current->type == TYPE_INITIALIZER) {
+            error("You cannot return a value from an initializer.");
+        }
         expression();
         consume(TOKEN_SEMICOLON, "Expected ';' after return value");
         emitByte(OP_RETURN);

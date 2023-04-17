@@ -13,7 +13,7 @@ static void repl() {
     printf("Motion v0.0.5\n");
     printf("Ctrl-C to Exit\n");
     printf("\n");
-    char line[1024];
+    char line[2048];
     for (;;) {
         printf(ANSI_COLOR_BLACK "~> " ANSI_COLOR_RESET);
 
