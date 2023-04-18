@@ -26,7 +26,7 @@ This will build the most recent version of Motion.
 > In order to make it easier to use Motion, consider adding the executable to your path. If you are on a unix system, and in the Motion directory, run this: 
 > `export PATH=$PATH:/workspaces/motion/bin/` in a terminal to add Motion to your path. 
 
-To confirm your install of motion, run `./motion --info`. If something like this appears,
+To confirm your install of motion, run `bin/motion --info`. If something like this appears,
 
 ```
 Motion v0.0.5
@@ -40,7 +40,7 @@ then congratulations. You have sucessfully installed Motion!
 ---
 
 ## Hello World
-To launch the REPL, either run `./motion` or, if you have added Motion to your path, `motion`. This will launch a Dynamic Read-Eval-Print-Loop (REPL), for you to explore, which looks like this:
+To launch the REPL, either run `bin/motion` or, if you have added Motion to your path, `motion`. This will launch a Dynamic Read-Eval-Print-Loop (REPL), for you to explore, which looks like this:
 ```
 Motion v0.0.5
 Ctrl-C to Exit
