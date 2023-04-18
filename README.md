@@ -1,4 +1,4 @@
-# Motion
+# Motion ↗️:
 
 Motion is a dynamically typed general purpose programming language designed to help developers write fast, clean, and efficient code for a modern world.
 
