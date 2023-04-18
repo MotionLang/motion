@@ -10,7 +10,7 @@ Motion is a variation of the Lox language found at www.craftinginterpreters.com 
 
 Motion's syntax aspires to be fresh, readable, and clean.
 
-```
+```python
 ## Comments are cool.
 
 var x; ## Declared variables are set to nil.
