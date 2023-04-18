@@ -1,8 +1,8 @@
 #include "/workspaces/motion/src/include/scanner.h"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/flags.h"
@@ -81,7 +81,7 @@ static void skipWhitespace() {
                 scanner.line++;
                 advance();
                 break;
-                
+
             // Comments; they look like ##
             case '#':
                 if (peekNext() == '#') {
@@ -159,6 +159,8 @@ static TokenType identifierType() {
                 }
             }
             break;
+        case 'u':
+            return checkKeyword(1, 2, "se", TOKEN_USE);
         case 'v':
             return checkKeyword(1, 2, "ar", TOKEN_VAR);
         case 'w':
@@ -239,11 +241,7 @@ Token scanToken() {
         case '=':
             return makeToken(match('=')
                                  ? TOKEN_EQUAL_EQUAL
-                                 : (match('>') 
-                                                ? TOKEN_EQUAL 
-                                                : TOKEN_EQUAL
-                                    )
-                            ); 
+                                 : (match('>') ? TOKEN_EQUAL : TOKEN_EQUAL));
         case '<':
             return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>':

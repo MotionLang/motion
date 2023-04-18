@@ -21,6 +21,9 @@ void freeTable(Table* table) {
 }
 
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
+    if (key == NULL) {
+        return NULL;
+    }
     uint32_t index = key->hash % capacity;
     for (;;) {
         Entry* entry = &entries[index];
@@ -31,6 +34,7 @@ static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
         index = (index + 1) % capacity;
     }
 }
+
 
 bool tableGet(Table* table, ObjString* key, Value* value) {
     if (table->count == 0) return false;
@@ -56,6 +60,7 @@ static void adjustCapacity(Table* table, int capacity) {
         if ((entry->key = NULL)) continue;
 
         Entry* dest = findEntry(entries, capacity, entry->key);
+        if ((dest->key = NULL)) continue;
         dest->key = entry->key;
         dest->value = entry->value;
         table->count++;

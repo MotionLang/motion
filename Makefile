@@ -66,3 +66,8 @@ vgmq:
 
 vgh:
 	valgrind --tool=helgrind -v bin/motion
+
+safe: $(OBJS)
+	$(CC) -g -fsanitize=address $(OBJS) -o $(OUT) $(LFLAGS)
+	mv $(OBJS) src/obj
+	mv $(OUT) bin

@@ -1,6 +1,8 @@
 #ifndef clox_scanner_h
 #define clox_scanner_h
 
+#include "value.h"
+
 typedef enum {
     // Single char tokens
     TOKEN_LEFT_PAREN,
@@ -42,6 +44,7 @@ typedef enum {
     TOKEN_SUPER,
     TOKEN_THIS,
     TOKEN_TRUE,
+    TOKEN_USE,
     TOKEN_VAR,
     TOKEN_WHILE,
 
@@ -59,6 +62,8 @@ typedef struct {
     const char* start;
     int length;
     int line;
+
+    Value value;
 } Token;
 
 typedef struct {

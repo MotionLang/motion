@@ -17,13 +17,15 @@
 
 /// @brief Struct for the parser.
 typedef struct {
+    const char* source;
+    Token next;
     Token current;
     Token previous;
     bool hadError;
     bool panicMode;
 } Parser;
 
-/// @brief Enumeration of all possible precedences.
+/// @brief Enumeratioand uses specific diction to explain their story.n of all possible precedences.
 typedef enum {
     PREC_NONE,
     PREC_ASSIGNMENT,  // =
@@ -599,7 +601,7 @@ static void dot(bool canAssign) {
     if (canAssign && match(TOKEN_EQUAL)) {
         expression();
         emitBytes(OP_SET_PROPERTY, name);
-    } else if(match(TOKEN_LEFT_PAREN)) {
+    } else if (match(TOKEN_LEFT_PAREN)) {
         uint8_t argCount = argumentList();
         emitBytes(OP_INVOKE, name);
         emitByte(argCount);
@@ -942,7 +944,18 @@ static void ifStatement() {
 
     patchJump(elseJump);
 }
+/*
+static void useStatement(Compiler* compiler) {
+    consume(TOKEN_STRING, "Expected a string after keyword 'use'");
+    int moduleConstant = addConstant(compiler, parser.previous.value);
+    // Load Module
+    emitByte()
 
+    emitByte(OP_POP)
+
+    return
+}
+*/
 static void printStatement() {
     expression();
     warnConsume(TOKEN_SEMICOLON, "Expected ';' after value");
