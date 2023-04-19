@@ -221,6 +221,8 @@ Token scanToken() {
             return makeToken(TOKEN_OPEN_BLOCK);
         case '}':
             return makeToken(TOKEN_CLOSE_BLOCK);
+        case '@':
+            return makeToken(TOKEN_AT);
         case ';':
             return makeToken(TOKEN_SEMICOLON);
         // Add replacement for newline with semicolon
@@ -249,5 +251,5 @@ Token scanToken() {
         case '"':
             return string();
     }
-    return errorToken("BadCharErr");
+    return errorToken("Invalid Character");
 }

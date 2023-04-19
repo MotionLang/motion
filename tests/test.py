@@ -11,8 +11,8 @@ def test(path, expected):
     global passed
     global failed
     os.system(
-        "export PATH=$PATH:/workspaces/motionLang/build")
-    cmd = "motion " + path
+        "export PATH=$PATH:/workspaces/motionLang/bin")
+    cmd = "bin/motion -r " + path
     out = subprocess.check_output(cmd, shell=True, universal_newlines=True)
     print(out)
     numtests = numtests + 1
@@ -20,6 +20,16 @@ def test(path, expected):
         passed = passed + 1
     else:
         failed = failed + 1
+
+def bench(path):
+    """Benchmark a path"""
+    global numtests
+    os.system(
+        "export PATH=$PATH:/workspaces/motionLang/bin")
+    cmd = "bin/motion -r " + path
+    out = subprocess.check_output(cmd, shell=True, universal_newlines=True)
+    print(out)
+    numtests = numtests + 1
 
 
 def stats():
@@ -30,6 +40,10 @@ def stats():
     input("Press Enter to continue...")
     menu()
 
+def benchstats():
+    print(str(numtests) + " Test(s)")
+    input("Press Enter to continue...")
+    menu()
 
 def vartests():
     """Run variable tests"""       
@@ -60,6 +74,10 @@ def ifTests():
     test("tests/testfiles/ifTests/ifElseTrue.mtn", "if")
     test("tests/testfiles/ifTests/ifElseFalse.mtn", "else")
 
+def benchtests():
+    bench("tests/testfiles/benchtests/binary_trees.mn")
+    bench("tests/testfiles/benchtests/zoo.mn")
+    bench("tests/testfiles/benchtests/strings.mn")
 
 
 
@@ -72,12 +90,18 @@ def menu():
     print("3: Comparison Tests")
     print("4: 'if' tests")
     
+    print("#: Benchmark Tests")
     print("@: All Tests")
 
 
     to_run = input("Choose: ")
     if to_run == "0":
         os._exit(0)
+
+    elif to_run == "#":
+        benchtests()
+        stats()
+
     elif to_run == "@":
         vartests()
         booltests()

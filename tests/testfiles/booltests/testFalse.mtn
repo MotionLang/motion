@@ -1,2 +1,2 @@
-var y = false;
+var y => false;
 print y;

@@ -1,7 +1,7 @@
-var x = 0;
-var y = 10;
+var x => 0;
+var y => 10;
 
 ## Reassign
-x = y;
+x => y;
 
 print x;

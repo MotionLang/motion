@@ -9,6 +9,7 @@ typedef enum {
     TOKEN_RIGHT_PAREN,
     TOKEN_OPEN_BLOCK,
     TOKEN_CLOSE_BLOCK,
+    TOKEN_AT,
     TOKEN_COMMA,
     TOKEN_DOT,
     TOKEN_MINUS,

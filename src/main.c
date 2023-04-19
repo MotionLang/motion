@@ -10,7 +10,7 @@
 #include "/workspaces/motion/src/include/vm.h"
 
 static void repl() {
-    printf("Motion v0.0.5\n");
+    printf("Motion %s\n", VERSION);
     printf("Ctrl-C to Exit\n");
     printf("\n");
     char line[2048];
@@ -80,7 +80,7 @@ int main(int argc, const char* argv[]) {
         repl();
     } else {
         if ((strcmp(argv[1], "-i") == 0) || (strcmp(argv[1], "--info") == 0)) {
-            printf("Motion v0.0.5\n");
+            printf("Motion %s\n", VERSION);
             printf("\n");
             printf(
                 "Motion is licensed under GPLv3. See "

@@ -1,4 +1,4 @@
-var x = 100;
+var x => 100;
 
 if (x == 100) {
     print "success";

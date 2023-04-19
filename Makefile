@@ -67,7 +67,14 @@ vgmq:
 vgh:
 	valgrind --tool=helgrind -v bin/motion
 
+vgc:
+	valgrind --tool=callgrind --simulate-cache=yes --collect-atstart=no --instr-atstart=no bin/motion -r tests/testfiles/benchtests/strings.mn
+
+
 safe: $(OBJS)
 	$(CC) -g -fsanitize=address $(OBJS) -o $(OUT) $(LFLAGS)
 	mv $(OBJS) src/obj
 	mv $(OUT) bin
+
+test:
+	python3 tests/test.py

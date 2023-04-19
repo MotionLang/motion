@@ -1,7 +1,7 @@
-var x = 10;
+var x => 10;
 
-if (x == 100) |
+if (x == 100) {
     print "if";
-end else |
+} else {
     print "else";
-end
+}
