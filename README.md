@@ -26,12 +26,15 @@ func add(a, b) => {
 }
 ```
 
-For more examples, see ```/examples```
+For more examples, see [examples](/example)
+
+## Why Motion?
+* ###  :rocket: Motion is Fast.
+* ### :bulb: Motion is Simple.
+* ### :lock: Motion is Safe.
 
 ## Contribution
-
-Motion is still in development. As such, I want to implement the basics as a solo project before others help. Please wait for version one before creating requests.
-
+See [Contribution](docs/
 However, more tests are always welcome. 
 To add a new test, fork the repository. Then, update  [```test.py```](tests/test.py) found in ```/tests```, and submit a pull request.
 
