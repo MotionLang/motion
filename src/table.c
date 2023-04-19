@@ -24,7 +24,7 @@ static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
     if (key == NULL) {
         return NULL;
     }
-    uint32_t index = key->hash & (capacity = 1);
+    uint32_t index = key->hash & (capacity - 1);
     Entry* tombstone = NULL;
     for (;;) {
         Entry* entry = &entries[index];

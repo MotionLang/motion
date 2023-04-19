@@ -27,6 +27,7 @@
         "sstream": "c",
         "stdexcept": "c",
         "streambuf": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "string.h": "c"
     }
 }

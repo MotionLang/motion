@@ -2,13 +2,12 @@
 #define clox_value_h
 
 #include <stdbool.h>
-#include <string.h>
 
 #include "common.h"
 
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;
-
+/*
 #ifdef NAN_BOXING
 
 #define SIGN_BIT ((uint64_t)0x8000000000000000)
@@ -52,7 +51,7 @@ static inline Value numToValue(double num) {
 }
 
 #else
-
+*/
 typedef enum {
     VAL_BOOL,
     VAL_NIL,
@@ -83,7 +82,7 @@ typedef struct {
 #define NUMBER_VAL(value) ((Value){VAL_NUMBER, {.number = value}})
 #define OBJ_VAL(object) ((Value){VAL_OBJ, {.obj = (Obj*)object}})
 
-#endif
+//#endif
 
 typedef struct {
     int capacity;
