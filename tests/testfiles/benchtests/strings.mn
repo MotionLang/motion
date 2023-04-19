@@ -1,0 +1,49 @@
+var start => clock();
+
+var one => "This is a string";
+var two => "This is a string";
+var three => "This is a string";
+var four => "This is a string";
+var five => "This is a string";
+var six => "This is a string";
+var seven => "This is a string";
+var eight => "This is a string";
+var nine => "This is a string";
+var ten => "This is a string";
+var eleven => "This is a string";
+var twelve => "This is a string";
+var thirteen => "This is a string";
+var fourteen => "This is a string";
+var fifteen => "This is a string";
+var sixteen => "This is a string";
+var seventeen => "This is a string";
+var eighteen => "This is a string";
+var nineteen => "This is a string";
+var twenty => "This is a string";
+
+print(one);
+print(two);
+print(three);
+print(four);
+print(five);
+print(six);
+print(seven);
+print(eight);
+print(nine);
+print(ten);
+print(eleven);
+print(twelve);
+print(thirteen);
+print(fourteen);
+print(fifteen);
+print(sixteen);
+print(seventeen);
+print(eighteen);
+print(nineteen);
+print(twenty);
+
+print clock() - start;
+
+## Original time: ~8 seconds..
+## new time: 0.004756
+## FAST!!

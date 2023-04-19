@@ -77,6 +77,8 @@ def ifTests():
 def benchtests():
     bench("tests/testfiles/benchtests/binary_trees.mn")
     bench("tests/testfiles/benchtests/zoo.mn")
+    bench("tests/testfiles/benchtests/strings.mn")
+
 
 
 def menu():
