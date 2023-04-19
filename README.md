@@ -20,7 +20,7 @@ var y => 10; var z => 2;
 print x * y;
 
 func add(a, b) => {
-	var new = (a + b);
+	var new => (a + b);
 	print new;
 	return new;
 }
