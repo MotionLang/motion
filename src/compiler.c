@@ -682,7 +682,7 @@ static void variable(bool canAssign) {
     namedVariable(parser.previous, canAssign);
 }
 
-static TOKEN syntheticToken(const char* text) {
+static Token syntheticToken(const char* text) {
     Token token;
     token.start = text;
     token.length = (int)strlen(text);

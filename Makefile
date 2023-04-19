@@ -71,3 +71,6 @@ safe: $(OBJS)
 	$(CC) -g -fsanitize=address $(OBJS) -o $(OUT) $(LFLAGS)
 	mv $(OBJS) src/obj
 	mv $(OUT) bin
+
+test:
+	python3 tests/test.py

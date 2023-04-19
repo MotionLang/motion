@@ -1,2 +1,2 @@
-var x =  nil;
+var x =>  nil;
 print x;
