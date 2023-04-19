@@ -29,26 +29,29 @@ func add(a, b) => {
 For more examples, see [examples](/example)
 
 ## Why Motion?
-* ###  :rocket: Motion is Fast.
+* ###  :rocket: Motion is Speedy.
+	- On benchmarks, Motion is almost twice as fast as a similar python program!
 * ### :bulb: Motion is Simple.
+	- Motion has a familiar, welcoming syntax. Everything "just works".
 * ### :lock: Motion is Safe.
+	- A self-hosted bytecode VM and JIT Compiler means security issues are far and few.
+* ### :floppy_disk: Motion is Small.
+	- No external dependancies and pure C means Motion is tiny, fitting at 130KB. That's small enough to fit on a floppy disk!
 
 ## Contribution
-See [Contribution](docs/
-However, more tests are always welcome. 
-To add a new test, fork the repository. Then, update  [```test.py```](tests/test.py) found in ```/tests```, and submit a pull request.
+See [Contribution](docs/Getting_Started/contributing.md)
 
 ## Features
-
 Motion supports (or will support):
 
 * :heavy_check_mark: Dynamic Typing
 * :heavy_check_mark: First Class Functions & Objects
 * :heavy_check_mark: Logical & Arithmetic Operators
-* :heavy_check_mark: Loops
+* :heavy_check_mark: Loops and Control Flow
 * :heavy_check_mark: Scoped Variables
 * :heavy_check_mark: Closures
+* :heavy_check_mark: Classes, Superclasses, & Inheritance
 * And more! (hopefully)
 
-## Compiling
+## Are you Ready to get Moving?
 See [Getting Started](docs/Getting_Started/Installation.md)
