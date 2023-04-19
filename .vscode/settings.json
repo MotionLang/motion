@@ -18,6 +18,15 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c",
-        "object.h": "c"
+        "object.h": "c",
+        "errors.h": "c",
+        "*.tcc": "c",
+        "exception": "c",
+        "fstream": "c",
+        "new": "c",
+        "sstream": "c",
+        "stdexcept": "c",
+        "streambuf": "c",
+        "cstddef": "c"
     }
 }

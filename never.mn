@@ -1,9 +1,0 @@
-func printTimes(item, times) do
-    var x = 0;
-    while(x != times) do
-        print item;
-        x = x+1;
-    end
-end
-
-printTimes("No!", 100);

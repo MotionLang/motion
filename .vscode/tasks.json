@@ -10,7 +10,7 @@
                 "-Wall",
                 "*.c",
                 "-o",
-                "/workspaces/motionLang/build/motion"
+                "/workspaces/motion/bin/motion"
             ],
             "options": {
                 "cwd": "${fileDirname}"

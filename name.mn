@@ -1,0 +1,4 @@
+use IO;
+
+var name = IO.in("What is your name?");
+IO.out("Hello", name);

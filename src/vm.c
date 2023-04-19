@@ -2,19 +2,39 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/compiler.h"
 #include "/workspaces/motion/src/include/debug.h"
+#include "/workspaces/motion/src/include/errors.h"
 #include "/workspaces/motion/src/include/memory.h"
 #include "/workspaces/motion/src/include/object.h"
 
 VM vm;
+
+static void runtimeError(const char* format, ...);
+
 // Native Function Declarations
 static Value clockNative(int argCount, Value* args) {
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
+
+static Value inputNative(int argCount, Value* args) { 
+    char line[1024];
+    fgets(line, sizeof(line), stdin);
+    return OBJ_VAL(copyString(line, strlen(line) - 1));
+}
+
+static Value exitNative(int argCount, Value* args) {
+    if(!IS_NUMBER(*args)) {
+        runtimeError("Exit can only accept int as arg");
+    }
+    int exitCode = AS_NUMBER(*args);
+    freeVM();
+    exit(exitCode);
 }
 
 static void resetStack() {
@@ -24,29 +44,37 @@ static void resetStack() {
 }
 
 static void runtimeError(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    fputs(ANSI_COLOR_RED "\n", stderr);
 
     for (int i = vm.frameCount - 1; i >= 0; i--) {
         CallFrame* frame = &vm.frames[i];
         ObjFunction* function = frame->closure->function;
         size_t instruction = frame->ip - function->chunk.code - 1;
-        fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+        fprintf(stderr, ANSI_COLOR_RED  "[line %d] [RUNTIME] " ANSI_COLOR_RESET,
+                function->chunk.lines[instruction]);
+
         if (function->name == NULL) {
-            fprintf(stderr, "script\n");
+            fprintf(stderr, ANSI_COLOR_RED "Error in script: " ANSI_COLOR_RESET);
         } else {
-            fprintf(stderr, "%s()\n", function->name->chars);
+            fprintf(stderr, ANSI_COLOR_RED "Error in %s(): " ANSI_COLOR_RESET, function->name->chars);
         }
+        va_list args;
+        va_start(args, format);
+        vfprintf(stderr, format, args);
+        va_end(args);
+        fputs(ANSI_COLOR_RED "\n", stderr);
     }
 
-    CallFrame* frame = &vm.frames[vm.frameCount - 1];
-    size_t instruction = frame->ip - frame->closure->function->chunk.code - 1;
-    int line = frame->closure->function->chunk.lines[instruction];
-    fprintf(stderr, "[line %d] in script\n", line);
+
+
+    //maCallFrame* frame = &vm.frames[vm.frameCount - 1];
+    //size_t instruction = frame->ip - frame->closure->function->chunk.code - 1;
+    //int line = frame->closure->function->chunk.lines[instruction];
+    // Not sure why this is here, works fine without it.
+    // fprintf(stderr, "[line %d] in script\n", line);
     printf(ANSI_COLOR_RESET);
+#ifdef DEBUG_TRACE_EXECUTION
+    printf(ANSI_COLOR_BLUE "[VM] [INFO] Resetting Stack \n" ANSI_COLOR_RESET);
+#endif
     resetStack();
 }
 
@@ -71,12 +99,19 @@ void initVM() {
     initTable(&vm.globals);
     initTable(&vm.strings);
 
+    vm.initString = NULL;
+    vm.initString = copyString("init", 4);
+
     defineNative("clock", clockNative);
+    defineNative("input", inputNative);
+    defineNative("exit", exitNative);
 }
+
 
 void freeVM() {
     freeTable(&vm.globals);
     freeTable(&vm.strings);
+    vm.initString = NULL;
 
     freeObjects();
 }
@@ -114,7 +149,8 @@ static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
 
 static bool call(ObjClosure* closure, int argCount) {
     if (argCount != closure->function->arity) {
-        runtimeError(ANSI_COLOR_RED "Expected %d arguments but received %d",
+        runtimeError(ANSI_COLOR_RED
+                     "Expected %d arguments but received %d",
                      closure->function->arity, argCount);
         return false;
     }
@@ -135,6 +171,24 @@ static bool call(ObjClosure* closure, int argCount) {
 static bool callValue(Value callee, int argCount) {
     if (IS_OBJ(callee)) {
         switch (OBJ_TYPE(callee)) {
+            case OBJ_BOUND_METHOD: {
+                ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+                vm.stackTop[-argCount - 1] = bound->receiver;
+                return call(bound->method, argCount);
+            }
+            case OBJ_CLASS: {
+                ObjClass* klass = AS_CLASS(callee);
+                vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(klass));
+                Value initializer;
+                if (tableGet(&klass->methods, vm.initString, &initializer)){
+                    return call(AS_CLOSURE(initializer), argCount);
+                } else if (argCount != 0) {
+                    runtimeError("Expected 0 arguments but recieved %d",
+                                 argCount);
+                    return false;
+                }
+                return true;
+            }
             case OBJ_CLOSURE:
                 return call(AS_CLOSURE(callee), argCount);
             case OBJ_NATIVE: {
@@ -148,8 +202,49 @@ static bool callValue(Value callee, int argCount) {
                 break;  // Non-Callable object type
         }
     }
-    runtimeError("Cannot call an object that is not a function or class");
+    runtimeError(
+        "Cannot call an object that is not a function or class");
     return false;
+}
+
+static bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount) {
+    Value method;
+    if (!tableGet(&klass->methods, name, &method)) {
+        runtimeError("Undefined property '%s'", name->chars);
+        return false;
+    }
+    return call(AS_CLOSURE(method), argCount);
+}
+
+static bool invoke(ObjString* name, int argCount) {
+    Value receiver = peek(argCount);
+
+    if(!IS_INSTANCE(receiver)) {
+        runtimeError("Only instances have methods");
+        return false;
+    }
+
+    ObjInstance* instance = AS_INSTANCE(receiver);
+
+    Value value;
+    if (tableGet(&instance->fields, name , &value)) {
+        vm.stackTop[-argCount - 1] = value;
+        return callValue(value, argCount);
+    }
+    return invokeFromClass(instance->klass, name, argCount);
+}
+
+static bool bindMethod(ObjClass* klass, ObjString* name) { 
+    Value method;
+    if (!tableGet(&klass->methods, name, &method)) {
+        runtimeError("Undefined property '%s'", name->chars);
+        return false;
+    }
+
+    ObjBoundMethod* bound = newBoundMethod(peek(0), AS_CLOSURE(method));
+    pop();
+    push(OBJ_VAL(bound));
+    return true;
 }
 
 static ObjUpvalue* captureUpvalue(Value* local) {
@@ -183,6 +278,13 @@ static void closeUpvalues(Value* last) {
         upvalue->location = &upvalue->closed;
         vm.openUpvalues = upvalue->next;
     }
+}
+
+static void defineMethod(ObjString* name) {
+    Value method = peek(0);
+    ObjClass* klass = AS_CLASS(peek(1));
+    tableSet(&klass->methods, name, method);
+    pop();
 }
 
 static bool isFalsey(Value value) {
@@ -220,7 +322,7 @@ static InterpretResult run() {
 #define BINARY_OP(valueType, op)                          \
     do {                                                  \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
-            runtimeError("Invalid Operands");             \
+            runtimeError("Invalid Operands");    \
             return INTERPRET_RUNTIME_ERROR;               \
         }                                                 \
         double b = AS_NUMBER(pop());                      \
@@ -274,7 +376,9 @@ static InterpretResult run() {
                 ObjString* name = READ_STRING();
                 Value value;
                 if (!tableGet(&vm.globals, name, &value)) {
-                    runtimeError(ANSI_COLOR_RED "Undefined variable '%s'.", name->chars);
+                    runtimeError(ANSI_COLOR_RED
+                                 "Undefined variable '%s'.",
+                                 name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(value);
@@ -290,7 +394,8 @@ static InterpretResult run() {
                 ObjString* name = READ_STRING();
                 if (tableSet(&vm.globals, name, peek(0))) {
                     tableDelete(&vm.globals, name);
-                    runtimeError("Undefined variable '%s'.", name->chars);
+                    runtimeError("Undefined variable '%s'.",
+                                 name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 break;
@@ -303,6 +408,41 @@ static InterpretResult run() {
             case OP_SET_UPVALUE: {
                 uint8_t slot = READ_BYTE();
                 *frame->closure->upvalues[slot]->location = peek(0);
+                break;
+            }
+            case OP_GET_PROPERTY: {
+                if (!IS_INSTANCE(peek(0))) {
+                    runtimeError("Only instances have properties");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(0));
+                ObjString* name = READ_STRING();
+
+                Value value;
+                if (tableGet(&instance->fields, name, &value)) {
+                    pop(); // Instance
+                    push(value);
+                    break;
+                }
+
+                if (!bindMethod(instance->klass, name)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+
+                runtimeError("Undefined property '%s", name->chars);
+                return INTERPRET_RUNTIME_ERROR;
+            }
+            case OP_SET_PROPERTY: {
+                if (!IS_INSTANCE(peek(1))) {
+                    runtimeError("Only instances have fields");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(1));
+                tableSet(&instance->fields, READ_STRING(), peek(0));
+                Value value = pop();
+                pop();
+                push(value);
                 break;
             }
             case OP_EQUAL: {
@@ -328,7 +468,7 @@ static InterpretResult run() {
                     push(NUMBER_VAL(a + b));
                 } else {
                     runtimeError(
-                        "InvalidOperandErr: Operands must be two numbers or "
+                        "Operands must be two numbers or "
                         "two strings");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -348,7 +488,7 @@ static InterpretResult run() {
                 break;
             case OP_NEGATE:
                 if (!IS_NUMBER(peek(0))) {
-                    runtimeError("InvalidOperatorErr");
+                    runtimeError("Invalid Operands");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(NUMBER_VAL(-AS_NUMBER(pop())));
@@ -378,6 +518,15 @@ static InterpretResult run() {
             case OP_CALL: {
                 int argCount = READ_BYTE();
                 if (!callValue(peek(argCount), argCount)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
+            case OP_INVOKE: {
+                ObjString* method = READ_STRING();
+                int argCount = READ_BYTE();
+                if (!invoke(method, argCount)) {
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 frame = &vm.frames[vm.frameCount - 1];
@@ -416,6 +565,14 @@ static InterpretResult run() {
                 vm.stackTop = frame->slots;
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
+            case OP_CLASS: {
+                push(OBJ_VAL(newClass(READ_STRING())));
+                break;
+            }
+            case OP_METHOD: {
+                defineMethod(READ_STRING());
                 break;
             }
         }

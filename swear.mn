@@ -1,8 +1,0 @@
-func noThree(a, b) |
-    var x = a + b;
-
-    swear(x != 3)
-    return x;
-|!
-
-print noThree(2, 1);

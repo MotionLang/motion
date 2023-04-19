@@ -1,0 +1,5 @@
+## This
+print foo(bar(baz()));
+
+## is equivelent to this
+print baz() >> bar >> foo;

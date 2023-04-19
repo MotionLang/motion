@@ -5,7 +5,6 @@
 
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/memory.h"
-#include "/workspaces/motion/src/include/object.h"
 #include "/workspaces/motion/src/include/value.h"
 
 #define TABLE_MAX_LOAD 0.75
@@ -22,10 +21,23 @@ void freeTable(Table* table) {
 }
 
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
+    if (key == NULL) {
+        return NULL;
+    }
     uint32_t index = key->hash % capacity;
+    Entry* tombstone = NULL;
     for (;;) {
         Entry* entry = &entries[index];
-        if (entry->key == key || entry->key == NULL) {
+        if (entry->key == NULL) {
+            if (IS_NIL(entry->value)) {
+                //Empty Entry
+                return tombstone != NULL ? tombstone : entry;
+            } else {
+                //Tombstone
+                if (tombstone == NULL) tombstone = entry;
+            }
+        } else if (entry->key == key) {
+            // Key
             return entry;
         }
 
@@ -54,9 +66,14 @@ static void adjustCapacity(Table* table, int capacity) {
 
     for (int i = 0; i < table->capacity; i++) {
         Entry* entry = &table->entries[i];
-        if ((entry->key = NULL)) continue;
+        if ((entry->key == NULL)) {
+            continue;
+        }
 
         Entry* dest = findEntry(entries, capacity, entry->key);
+        //if (dest->key == NULL) {
+        //    continue;
+        //}
         dest->key = entry->key;
         dest->value = entry->value;
         table->count++;
@@ -124,7 +141,7 @@ ObjString* tableFindString(Table* table, const char* chars, int length,
     }
 }
 
-void tableRemoveWhite(Table* table) { 
+void tableRemoveWhite(Table* table) {
     for (int i = 0; i < table->capacity; i++) {
         Entry* entry = &table->entries[i];
         if (entry->key != NULL && !entry->key->obj.isMarked) {
@@ -133,7 +150,7 @@ void tableRemoveWhite(Table* table) {
     }
 }
 
-void markTable(Table* table) { 
+void markTable(Table* table) {
     for (int i = 0; i < table->capacity; i++) {
         Entry* entry = &table->entries[i];
         markObject((Obj*)entry->key);

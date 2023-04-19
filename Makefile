@@ -11,8 +11,8 @@ all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 	mv $(OBJS) src/obj
 	mv $(OUT) bin
-	export PATH=${PATH}:/workspaces/motion/bin
 	clear
+	bin/motion
 
 main.o: main.c
 	$(CC) $(FLAGS) src/main.c -std=c99
@@ -25,6 +25,9 @@ compiler.o: compiler.c
 
 debug.o: debug.c
 	$(CC) $(FLAGS) src/debug.c -std=c99
+
+#errors.o: errors.c
+#	$(CC) $(FLAGS) src/errors.c -std=c99
 
 memory.o: memory.c
 	$(CC) $(FLAGS) src/memory.c -std=c99
@@ -50,8 +53,21 @@ clean:
 	rm -fv bin/$(OUT)
 	mkdir src/obj
 
+fclean:
+	rm -fvr *.o
+exp:
+	export PATH=${PATH}:/workspaces/motion/bin/
+
 vgm:
 	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -v bin/motion
 
+vgmq:
+	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes -q bin/motion
+
 vgh:
 	valgrind --tool=helgrind -v bin/motion
+
+safe: $(OBJS)
+	$(CC) -g -fsanitize=address $(OBJS) -o $(OUT) $(LFLAGS)
+	mv $(OBJS) src/obj
+	mv $(OUT) bin
