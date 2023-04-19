@@ -66,11 +66,12 @@ typedef struct {
     Value value;
 } Token;
 
+/*
 typedef struct {
     const char* start;
     const char* current;
     int line;
-} Scanner;
+} Scanner; */
 
 void initScanner(const char* source);
 Token scanToken();

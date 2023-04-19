@@ -14,9 +14,10 @@
 //#define DEBUG_STRESS_GC
 //#define DEBUG_LOG_GC
 
-// Except for this.
+// Constants
 #define UINT8_COUNT (UINT8_MAX + 1)
 
+//Colors
 #define ANSI_COLOR_BLACK "\e[0;30m"
 #define ANSI_COLOR_RED "\e[0;31m"
 #define ANSI_COLOR_YELLOW "\e[0;33m"

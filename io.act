@@ -1,6 +1,7 @@
 ## MODULE IO
 
 def IO => {
+
     out(contents) => {
         print(contents);
     }
@@ -14,5 +15,11 @@ def IO => {
     err(message, code) => {
         print(message);
         exit(code);
-    }  
+    }
+
+      
 }
+var IO => IO();
+
+var name => IO.in("What is your name?");
+IO.out("Hello, " + name);

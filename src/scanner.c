@@ -7,13 +7,13 @@
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/flags.h"
 
-/*
+
 typedef struct {
     const char* start;
     const char* current;
     int line;
 } Scanner;
-*/
+
 
 Scanner scanner;
 

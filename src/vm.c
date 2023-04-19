@@ -24,7 +24,6 @@ static Value clockNative(int argCount, Value* args) {
 
 static Value inputNative(int argCount, Value* args) { 
     char line[1024];
-    ObjString result;
     fgets(line, sizeof(line), stdin);
     return OBJ_VAL(copyString(line, strlen(line) - 1));
 }
