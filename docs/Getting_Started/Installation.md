@@ -58,3 +58,5 @@ Notice the optional parentheses around the `print` statement. This is because `p
 > The version numbers of your install of Motion may be different. However, this is fine for our purposes.
 
 If you recieve an error, check your code to make sure that your code matches the example. 
+
+## Next [~>](motion/docs/basics/variables.md)
