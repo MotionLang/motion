@@ -25,6 +25,7 @@ This will build the most recent version of Motion.
 
 > In order to make it easier to use Motion, consider adding the executable to your path. If you are on a unix system, and in the Motion directory, run this: 
 > `export PATH=$PATH:/workspaces/motion/bin/` in a terminal to add Motion to your path. 
+> If you do this, remember to run `motion` instead of `bin/motion`.
 
 To confirm your install of motion, run `bin/motion --info`. If something like this appears,
 
