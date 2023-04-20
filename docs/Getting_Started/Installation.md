@@ -30,7 +30,7 @@ This will build the most recent version of Motion.
 To confirm your install of motion, run `bin/motion --info`. If something like this appears,
 
 ```
-Motion v0.0.5
+Motion v1.0.0
 
 Motion is licensed under GPLv3. See https://www.gnu.org/licenses/gpl-3.0.en.html for more information.
 
