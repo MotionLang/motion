@@ -69,3 +69,5 @@ print "check:";
 print longLivedTree.check();
 print "elapsed:";
 print clock() - start;
+
+## 5.90351

@@ -39,7 +39,7 @@ For more examples, see [examples](/example)
 	- No external dependancies and pure C means Motion is tiny, fitting at 130KB. That's small enough to fit on a floppy disk!
 
 ## Contribution
-See [Contribution](docs/Getting_Started/contributing.md)
+See [Contribution](CONTRIBUTING.md)
 
 ## Features
 Motion supports (or will support):

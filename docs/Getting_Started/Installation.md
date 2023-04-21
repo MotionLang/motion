@@ -1,5 +1,5 @@
 # Getting Started with Motion
-# Part 1: Welcome and Installation
+## Part 1: Welcome and Installation
 
 ## Intro
 Welcome! If you are reading this, then you are on the path to start developing with Motion. In this guide, you will learn the basics of installing, running, and programming in Motion.
@@ -59,4 +59,4 @@ Notice the optional parentheses around the `print` statement. This is because `p
 
 If you recieve an error, check your code to make sure that your code matches the example. 
 
-## Next [~>](motion/docs/basics/variables.md)
+## [Next ~>](motion/docs/Getting_Started/basics/variables.md)
