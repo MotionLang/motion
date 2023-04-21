@@ -1,8 +1,8 @@
 # Contribution:
 
-Unfourtunatly, Motion is still in development. However, this will change soon!
-In order to keep things neat, I have decided to wait for version 1.0 to allow for community contributions.
+If you wish to contribute to the Motion Language, feel free to do so! Heres how:
 
-However, this does not mean that you cannot support the project. Forks 🍴, stars ⭐️, and more are welcome!
-
-Thank you for your cooperation.
+  1. Fork this repository.
+  2. Make your changes. Please follow the style guidelines!
+  3. Create a pull request.
+  4. Done!
