@@ -78,6 +78,7 @@ static void skipWhitespace() {
                 advance();
                 break;
             case '\n':
+                makeToken(TOKEN_NEWLINE);
                 scanner.line++;
                 advance();
                 break;

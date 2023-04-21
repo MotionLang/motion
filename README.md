@@ -34,12 +34,12 @@ For more examples, see [examples](/example)
 * ### :bulb: Motion is Simple.
 	- Motion has a familiar, welcoming syntax. Everything "just works".
 * ### :lock: Motion is Safe.
-	- A self-hosted bytecode VM and JIT Compiler means security issues are far and few.
+	- A bytecode VM and JIT Compiler means security issues are far and few.
 * ### :floppy_disk: Motion is Small.
 	- No external dependancies and pure C means Motion is tiny, fitting at 130KB. That's small enough to fit on a floppy disk!
 
 ## Contribution
-See [Contribution](docs/Getting_Started/contributing.md)
+See [Contribution](CONTRIBUTING.md)
 
 ## Features
 Motion supports (or will support):

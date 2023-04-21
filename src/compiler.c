@@ -123,7 +123,7 @@ static void errorAt(Token* token, const char* message) {
     However, it doesn't work. The contents of the parser are unpredictable, I
     don't know what to do. Comment out for now.
 
-    const char* contents = parser.previous.start;
+    const char* contents = parser.current.start;
     printf(
         "%d | %s %c\n", (parser.current.line) - 1,
         stringWithArrows(contents, 3, strlen(contents)));
@@ -779,6 +779,7 @@ ParseRule rules[] = {
     [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
     [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
     [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_NEWLINE] = {NULL, NULL, PREC_NONE},
     [TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
     [TOKEN_EOF] = {NULL, NULL, PREC_NONE},
 };
@@ -814,7 +815,7 @@ static void block() {
         declaration();
     }
 
-    warnConsume(TOKEN_CLOSE_BLOCK, "A '}' is reccommended after a block.");
+    warnConsume(TOKEN_CLOSE_BLOCK, "A '}' is reccommended to close a block");
 }
 
 static void function(FunctionType type) {
@@ -836,6 +837,7 @@ static void function(FunctionType type) {
     warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
     consume(TOKEN_EQUAL, "Expected a '=>' before function body.");
     warnConsume(TOKEN_OPEN_BLOCK, "A '{' is recommended before function body.");
+
     block();
 
     ObjFunction* function = endCompiler();

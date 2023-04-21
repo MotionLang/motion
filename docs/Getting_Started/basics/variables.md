@@ -1,9 +1,9 @@
 ## Variables:
 
-Variables are created with the ```var``` keyword, followed by an ```=``` and their value, like so.
+Variables are created with the ```var``` keyword, followed by an ```=>``` and their value, like so.
 
 ```
-var x = 1;
+var x => 1;
 ```
 Variables are dynamic, so no type annotations are required.
 

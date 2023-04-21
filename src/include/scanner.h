@@ -49,6 +49,8 @@ typedef enum {
     TOKEN_VAR,
     TOKEN_WHILE,
 
+    // Misc
+    TOKEN_NEWLINE,
     TOKEN_ERROR,
     TOKEN_EOF
 } TokenType;

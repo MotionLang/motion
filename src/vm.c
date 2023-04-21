@@ -116,6 +116,10 @@ void freeVM() {
     freeObjects();
 }
 
+void injectVM() {
+
+}
+
 void push(Value value) {
     *vm.stackTop = value;
     vm.stackTop++;

@@ -26,7 +26,7 @@ static void repl() {
     }
 }
 
-static char* readFile(const char* path) {
+static char* readSource(const char* path) {
     FILE* file = fopen(path, "rb");
 
     if (file == NULL) {
@@ -62,8 +62,8 @@ static char* readFile(const char* path) {
     return buffer;
 }
 
-static void runFile(const char* path) {
-    char* source = readFile(path);
+static void runSource(const char* path) {
+    char* source = readSource(path);
     InterpretResult result = interpret(source);
     free(source);
 
@@ -99,7 +99,7 @@ int main(int argc, const char* argv[]) {
                 "file you wish to execute\n");
 
         } else if ((strcmp(argv[1], "--run")) || (strcmp(argv[1], "-r")) == 0) {
-            runFile(argv[2]);
+            runSource(argv[2]);
         } else if ((strcmp(argv[3], "--strict")) || (strcmp(argv[3], "-s")) == 0) {
             FLAG_STRICT = true;
         } else {

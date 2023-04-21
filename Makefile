@@ -14,6 +14,13 @@ all: $(OBJS)
 	clear
 	bin/motion
 
+release: $(OBJS)
+	$(CC) -Ofast -g $(OBJS) -o $(OUT) $(LFLAGS)
+	mv $(OBJS) src/obj
+	mv $(OUT) bin
+	clear
+	bin/motion
+
 main.o: main.c
 	$(CC) $(FLAGS) src/main.c -std=c99
 

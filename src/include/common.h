@@ -8,7 +8,7 @@
 #define VERSION "1.0.0"
 
 // Value Representation flag:
-//#define NAN_BOXING
+#define NAN_BOXING
 
 // Debugging commands.
 // Comment these out for release or tests
