@@ -1,6 +1,6 @@
-OBJS	= main.o chunk.o compiler.o debug.o memory.o object.o scanner.o table.o value.o vm.o
-SOURCE	= main.c chunk.c compiler.c debug.c memory.c object.c scanner.c table.c value.c vm.c
-HEADER	= common.h chunk.h compiler.h debug.h memory.h object.h scanner.h table.h value.h vm.h
+OBJS	= main.o chunk.o compiler.o debug.o flags.o memory.o object.o scanner.o table.o value.o vm.o
+SOURCE	= main.c chunk.c compiler.c debug.c flags.c memory.c object.c scanner.c table.c value.c vm.c
+HEADER	= common.h chunk.h compiler.h debug.h flags.h memory.h object.h scanner.h table.h value.h vm.h
 OUT	= motion
 CC	 = gcc
 FLAGS	 = -g -c -Wall
@@ -32,6 +32,9 @@ compiler.o: compiler.c
 
 debug.o: debug.c
 	$(CC) $(FLAGS) src/debug.c -std=c99
+
+flags.o: flags.c
+	$(CC) $(FLAGS) src/flags.c -std=c99
 
 #errors.o: errors.c
 #	$(CC) $(FLAGS) src/errors.c -std=c99

@@ -10,6 +10,7 @@
 #include "/workspaces/motion/src/include/flags.h"
 #include "/workspaces/motion/src/include/memory.h"
 #include "/workspaces/motion/src/include/scanner.h"
+#include "/workspaces/motion/src/include/errors.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "/workspaces/motion/src/include/debug.h"
@@ -101,7 +102,7 @@ static Chunk* currentChunk() { return &current->function->chunk; }
 /// @brief Prints out an error at Token* token, with an provided message.
 /// @param token Token
 /// @param message Message
-static void errorAt(Token* token, const char* message) {
+static void errorAt(Token* token, const char* message, errorCode code) {
     if (parser.panicMode) return;
     parser.panicMode = true;
     fprintf(stderr, ANSI_COLOR_RED "[line %d] [ERROR]    Error",
@@ -116,7 +117,7 @@ static void errorAt(Token* token, const char* message) {
                 token->start);
     }
 
-    fprintf(stderr, ANSI_COLOR_RED ": %s\n", message);
+    fprintf(stderr, ANSI_COLOR_RED ": %s [CE%d]\n", message, code);
     parser.hadError = true;
     printf(ANSI_COLOR_RESET);
     /* FIXME: This code should display a "snippet" of the erroneous code.
@@ -132,18 +133,18 @@ static void errorAt(Token* token, const char* message) {
 
 /// @brief Wrapper for the errorAt function.
 /// @param message A message to be displayed.
-static void error(const char* message) { errorAt(&parser.previous, message); }
+static void error(const char* message, errorCode code) { errorAt(&parser.previous, message, code); }
 
 /// @brief Creates an error at the current token provided by the parser.
 /// @param message A message to be displayed.
-static void errorAtCurrent(const char* message) {
-    errorAt(&parser.current, message);
+static void errorAtCurrent(const char* message, errorCode code) {
+    errorAt(&parser.current, message, code);
 }
 
 /// @brief Creates a warning at the provided token, and displays a message.
 /// @param token A token
 /// @param message A message to be displayed.
-static void warnAt(Token* token, const char* message) {
+static void warnAt(Token* token, const char* message, errorCode code) {
     if (FLAG_STRICT == false) {
         if (parser.panicMode) return;
         // parser.panicMode = true;
@@ -159,11 +160,11 @@ static void warnAt(Token* token, const char* message) {
                     token->start);
         }
 
-        fprintf(stderr, ANSI_COLOR_YELLOW ": %s\n", message);
+        fprintf(stderr, ANSI_COLOR_YELLOW ": %s [CE%d]\n", message, code);
         // parser.hadError = true;
         printf(ANSI_COLOR_RESET);
     } else {
-        errorAt(token, message);
+        errorAt(token, message, code);
     }
 }
 
@@ -171,8 +172,8 @@ static void warnAt(Token* token, const char* message) {
 
 /// @brief A wrapper for the warnAt function
 /// @param message A message to be displayed.
-static void warnAtCurrent(const char* message) {
-    warnAt(&parser.current, message);
+static void warnAtCurrent(const char* message, errorCode code) {
+    warnAt(&parser.current, message, code);
 }
 
 /// @brief Advances the current token in the parser by setting the previous
@@ -184,33 +185,33 @@ static void advance() {
         parser.current = scanToken();
         if (parser.current.type != TOKEN_ERROR) break;
 
-        errorAtCurrent(parser.current.start);
+        errorAtCurrent(parser.current.start, ERR_FATAL);
     }
 }
 /// @brief Consumes the next token. If the token recieved differs from the one
 /// requested, it returns an error.
 /// @param type Expected token type.
 /// @param message Message to be displayed
-static void consume(TokenType type, const char* message) {
+static void consume(TokenType type, const char* message, errorCode code) {
     if (parser.current.type == type) {
         advance();
         return;
     }
 
-    errorAtCurrent(message);
+    errorAtCurrent(message, code);
 }
 
 /// @brief Consumes the next token. If the token recieved differs from the one
 /// requested it returns a warning.
 /// @param type Expected token type
 /// @param message Message to be displayed
-static void warnConsume(TokenType type, const char* message) {
+static void warnConsume(TokenType type, const char* message, errorCode code) {
     if (parser.current.type == type) {
         advance();
         return;
     }
 
-    warnAtCurrent(message);
+    warnAtCurrent(message, code);
 }
 /// @brief Returns a boolean representing if the current token in the parser
 /// matches the token provided.
@@ -256,7 +257,7 @@ static void emitLoop(int loopStart) {
 
     int offset = currentChunk()->count - loopStart + 2;
     if (offset > UINT16_MAX) {
-        error("Loop body too large (CE001)");
+        error("Loop body too large", ERR_BAD_LOOP);
     }
 
     emitByte((offset >> 8) & 0xff);
@@ -288,7 +289,7 @@ static void emitReturn() {
 static uint8_t makeConstant(Value value) {
     int constant = addConstant(currentChunk(), value);
     if (constant > UINT8_MAX) {
-        error("Chunk Constant Overflow");
+        error("Chunk Constant Overflow", ERR_OVERFLOW);
         return 0;
     }
 
@@ -309,7 +310,7 @@ static void patchJump(int offset) {
     int jump = currentChunk()->count - offset - 2;
 
     if (jump > UINT16_MAX) {
-        error("Code Jump Overflow");
+        error("Code Jump Overflow", ERR_OVERFLOW);
     }
 
     currentChunk()->code[offset] = (jump >> 8) & 0xff;
@@ -408,7 +409,7 @@ static int resolveLocal(Compiler* compiler, Token* name) {
         Local* local = &compiler->locals[i];
         if (identifiersEqual(name, &local->name)) {
             if (local->depth == -1) {
-                error("Cannot read local variable in its own initializer");
+                error("Cannot read local variable in its own initializer", ERR_BAD_VAR);
             }
             return i;
         }
@@ -434,7 +435,7 @@ static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal) {
     }
 
     if (upvalueCount == UINT8_COUNT) {
-        error("Closure variable limit exceeded in this function");
+        error("Closure variable limit exceeded in this function", ERR_OVERFLOW);
         return 0;
     }
 
@@ -467,7 +468,7 @@ static int resolveUpvalue(Compiler* compiler, Token* name) {
 
 static void addLocal(Token name) {
     if (current->localCount == UINT8_COUNT) {
-        error("Too many local variables in function.");
+        error("Too many local variables in function.", ERR_OVERFLOW);
         return;
     }
 
@@ -492,15 +493,14 @@ static void declareVariable() {
 
         if (identifiersEqual(name, &local->name)) {
             error(
-                "A variable with this name already exists within this scope "
-                "[CE001]");
+                "A variable with this name already exists within this scope ", ERR_BAD_VAR);
         }
     }
     addLocal(*name);
 }
 
 static uint8_t parseVariable(const char* errorMessage) {
-    consume(TOKEN_IDENTIFIER, errorMessage);
+    consume(TOKEN_IDENTIFIER, errorMessage, ERR_BAD_VAR);
 
     declareVariable();
     if (current->scopeDepth > 0) {
@@ -532,12 +532,12 @@ static uint8_t argumentList() {
         do {
             expression();
             if (argCount == 255) {
-                error("Cannot excede more than 255 arguments");
+                error("Cannot excede more than 255 arguments", ERR_OVERFLOW);
             }
             argCount++;
         } while (match(TOKEN_COMMA));
     }
-    warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after arguments");
+    warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after arguments", ERR_SYNTAX);
     return argCount;
 }
 
@@ -597,7 +597,7 @@ static void call(bool canAssign) {
 }
 
 static void dot(bool canAssign) {
-    consume(TOKEN_IDENTIFIER, "Expected property name after '.'");
+    consume(TOKEN_IDENTIFIER, "Expected property name after '.'", ERR_BAD_PROPERTY);
     uint8_t name = identifierConstant(&parser.previous);
 
     if (canAssign && match(TOKEN_EQUAL)) {
@@ -630,7 +630,7 @@ static void literal(bool canAssign) {
 
 static void grouping(bool canAssign) {
     expression();
-    consume(TOKEN_RIGHT_PAREN, "Expected a ')' after expression");
+    consume(TOKEN_RIGHT_PAREN, "Expected a ')' after expression", ERR_SYNTAX);
 }
 
 static void number(bool canAssign) {
@@ -691,12 +691,12 @@ static Token syntheticToken(const char* text) {
 
 static void super_(bool canAssign) {
     if (currentClass == NULL) {
-        error("Cannot use keyword 'super' outside of a class");
+        error("Cannot use keyword 'super' outside of a class", ERR_BAD_SUPER);
     } else if (!currentClass->hasSuperclass) {
-        error("Cannot use keyword 'super' inside a class with no superclass");
+        error("Cannot use keyword 'super' inside a class with no superclass", ERR_BAD_SUPER);
     }
-    consume(TOKEN_DOT, "Expected a '.' after keyword 'super'");
-    consume(TOKEN_IDENTIFIER, "Expected a superclass method name");
+    consume(TOKEN_DOT, "Expected a '.' after keyword 'super'", ERR_BAD_SUPER);
+    consume(TOKEN_IDENTIFIER, "Expected a superclass method name", ERR_BAD_SUPER);
     uint8_t name = identifierConstant(&parser.previous);
 
     namedVariable(syntheticToken("this"), false);
@@ -713,7 +713,7 @@ static void super_(bool canAssign) {
 
 static void this_(bool canAssign) {
     if (currentClass == NULL) {
-        error("Cannot use keyword 'this' outside of a class");
+        error("Cannot use keyword 'this' outside of a class", ERR_BAD_THIS);
         return;
     }
 
@@ -788,7 +788,7 @@ static void parsePrecedence(Precedence precedence) {
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
     if (prefixRule == NULL) {
-        error("Expected Expression [CE002]");
+        error("Expected Expression", ERR_MISSING_EXPR);
         return;
     }
 
@@ -802,7 +802,7 @@ static void parsePrecedence(Precedence precedence) {
     }
 
     if (canAssign && match(TOKEN_EQUAL)) {
-        error("Invalid assignment target [CE003]");
+        error("Invalid assignment target", ERR_BAD_ASSIGN);
     }
 }
 
@@ -814,8 +814,7 @@ static void block() {
     while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
         declaration();
     }
-
-    warnConsume(TOKEN_CLOSE_BLOCK, "A '}' is reccommended to close a block");
+    warnConsume(TOKEN_CLOSE_BLOCK, "A '}' is reccommended to close a block", ERR_BLOCK);
 }
 
 static void function(FunctionType type) {
@@ -823,20 +822,20 @@ static void function(FunctionType type) {
     initCompiler(&compiler, type);
     beginScope();
 
-    consume(TOKEN_LEFT_PAREN, "Expected a '(' after function name");
+    consume(TOKEN_LEFT_PAREN, "Expected a '(' after function name", ERR_PAREN);
     if (!check(TOKEN_RIGHT_PAREN)) {
         do {
             current->function->arity++;
             if (current->function->arity > 255) {
-                errorAtCurrent("Parameter limit exceded");
+                errorAtCurrent("Parameter limit exceded", ERR_OVERFLOW);
             }
-            uint8_t constant = parseVariable("Expected parameter name [CE004]");
+            uint8_t constant = parseVariable("Expected parameter name");
             defineVariable(constant);
         } while (match(TOKEN_COMMA));
     }
-    warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_EQUAL, "Expected a '=>' before function body.");
-    warnConsume(TOKEN_OPEN_BLOCK, "A '{' is recommended before function body.");
+    warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.", ERR_PAREN);
+    consume(TOKEN_EQUAL, "Expected a '=>' before function body.", ERR_SYNTAX);
+    warnConsume(TOKEN_OPEN_BLOCK, "A '{' is recommended before function body.", ERR_BLOCK);
 
     block();
 
@@ -850,7 +849,7 @@ static void function(FunctionType type) {
 }
 
 static void method() {
-    consume(TOKEN_IDENTIFIER, "Expected a method name.");
+    consume(TOKEN_IDENTIFIER, "Expected a method name.", ERR_BAD_METHOD);
     uint8_t constant = identifierConstant(&parser.previous);
 
     FunctionType type = TYPE_METHOD;
@@ -864,7 +863,7 @@ static void method() {
 }
 
 static void classDeclaration() {
-    consume(TOKEN_IDENTIFIER, "Expected a class name");
+    consume(TOKEN_IDENTIFIER, "Expected a class name", ERR_BAD_CLASS);
     Token className = parser.previous;
     uint8_t nameConstant = identifierConstant(&parser.previous);
     declareVariable();
@@ -878,11 +877,11 @@ static void classDeclaration() {
     currentClass = &classCompiler;
 
     if (match(TOKEN_AT)) {
-        consume(TOKEN_IDENTIFIER, "Expected a superclass name");
+        consume(TOKEN_IDENTIFIER, "Expected a superclass name", ERR_BAD_SUPER);
         variable(false);
 
         if (identifiersEqual(&className, &parser.previous)) {
-            error("A class cannot inherit from itself");
+            error("A class cannot inherit from itself", ERR_BAD_CLASS);
         }
 
         beginScope();
@@ -895,12 +894,12 @@ static void classDeclaration() {
     }
 
     namedVariable(className, false);
-    consume(TOKEN_EQUAL, "Expected a '=>' before class body");
-    warnConsume(TOKEN_OPEN_BLOCK, "Expected a '{' before class body");
+    consume(TOKEN_EQUAL, "Expected a '=>' before class body", ERR_SYNTAX);
+    warnConsume(TOKEN_OPEN_BLOCK, "Expected a '{' before class body", ERR_BLOCK);
     while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
         method();
     }
-    warnConsume(TOKEN_CLOSE_BLOCK, "Expected '}' after class body");
+    warnConsume(TOKEN_CLOSE_BLOCK, "Expected '}' after class body", ERR_BLOCK);
     emitByte(OP_POP);
 
     if (classCompiler.hasSuperclass) {
@@ -925,20 +924,20 @@ static void varDeclaration() {
     } else {
         emitByte(OP_NIL);
     }
-    warnConsume(TOKEN_SEMICOLON, "Expected ';' after variable declaration.");
+    warnConsume(TOKEN_SEMICOLON, "Expected ';' after variable declaration.", ERR_SYNTAX);
 
     defineVariable(global);
 }
 
 static void expressionStatement() {
     expression();
-    warnConsume(TOKEN_SEMICOLON, "Expected ';' after expression");
+    warnConsume(TOKEN_SEMICOLON, "Expected ';' after expression", ERR_PAREN);
     emitByte(OP_POP);
 }
 
 static void forStatement() {
     beginScope();
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'for')");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'for')", ERR_PAREN);
     if (match(TOKEN_SEMICOLON)) {
         // No init
     } else if (match(TOKEN_VAR)) {
@@ -951,7 +950,7 @@ static void forStatement() {
     int exitJump = -1;
     if (!match(TOKEN_SEMICOLON)) {
         expression();
-        consume(TOKEN_SEMICOLON, "Expected ';' after loop condition.");
+        consume(TOKEN_SEMICOLON, "Expected ';' after loop condition.", ERR_SYNTAX);
 
         // Jump out of the loop if the condition is false
         exitJump = emitJump(OP_JUMP_IF_FALSE);
@@ -963,7 +962,7 @@ static void forStatement() {
         int incrementStart = currentChunk()->count;
         expression();
         emitByte(OP_POP);
-        consume(TOKEN_RIGHT_PAREN, "Expected ')' after 'for' clause");
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' after 'for' clause", ERR_PAREN);
 
         emitLoop(loopStart);
         loopStart = incrementStart;
@@ -982,9 +981,9 @@ static void forStatement() {
 }
 
 static void ifStatement() {
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'if')");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'if')", ERR_PAREN);
     expression();
-    warnConsume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
+    warnConsume(TOKEN_RIGHT_PAREN, "Expected ')' after condition", ERR_PAREN);
 
     int thenJump = emitJump(OP_JUMP_IF_FALSE);
     emitByte(OP_POP);
@@ -1015,32 +1014,32 @@ static void useStatement(Compiler* compiler) {
 */
 static void printStatement() {
     expression();
-    warnConsume(TOKEN_SEMICOLON, "Expected ';' after value");
+    warnConsume(TOKEN_SEMICOLON, "Expected ';' after value", ERR_SYNTAX);
     emitByte(OP_PRINT);
 }
 
 static void returnStatement() {
     if (current->type == TYPE_SCRIPT) {
-        error("Cannot return from main code body. [CE005]");
+        error("Cannot return from main code body.", ERR_BAD_RETURN);
     }
 
     if (match(TOKEN_SEMICOLON)) {
         emitReturn();
     } else {
         if (current->type == TYPE_INITIALIZER) {
-            error("You cannot return a value from an initializer.");
+            error("You cannot return a value from an initializer.", ERR_BAD_RETURN);
         }
         expression();
-        consume(TOKEN_SEMICOLON, "Expected ';' after return value");
+        warnConsume(TOKEN_SEMICOLON, "Expected ';' after return value", ERR_SYNTAX);
         emitByte(OP_RETURN);
     }
 }
 
 static void whileStatement() {
     int loopStart = currentChunk()->count;
-    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'while'");
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after keyword 'while'", ERR_PAREN);
     expression();
-    consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition");
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after condition", ERR_PAREN);
 
     int exitJump = emitJump(OP_JUMP_IF_FALSE);
     emitByte(OP_POP);

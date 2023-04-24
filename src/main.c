@@ -9,6 +9,27 @@
 #include "/workspaces/motion/src/include/memory.h"
 #include "/workspaces/motion/src/include/vm.h"
 
+static void helpInfo() {
+    printf("Help:\n");
+    printf("--help / -h: This command\n");
+    printf("--info / -i: Information about Motion\n");
+    printf(
+        "--run / -r:  Run a file. The final argument is the path to "
+        "the "
+        "file you wish to execute\n");
+}
+
+static void infoInfo() {
+    printf("Motion %s\n", VERSION);
+    printf("\n");
+    printf(
+        "Motion is licensed under GPLv3. See "
+        "https://www.gnu.org/licenses/gpl-3.0.en.html for more "
+        "information.\n");
+    printf("\n");
+    printf("Type -h for help.\n");
+}
+
 static void repl() {
     printf("Motion %s\n", VERSION);
     printf("Ctrl-C to Exit\n");
@@ -73,42 +94,25 @@ static void runSource(const char* path) {
 
 int main(int argc, const char* argv[]) {
     initVM();
-
-    FLAG_STRICT = false;
-
     if (argc == 1) {
         repl();
     } else {
         if ((strcmp(argv[1], "-i") == 0) || (strcmp(argv[1], "--info") == 0)) {
-            printf("Motion %s\n", VERSION);
-            printf("\n");
-            printf(
-                "Motion is licensed under GPLv3. See "
-                "https://www.gnu.org/licenses/gpl-3.0.en.html for more "
-                "information.\n");
-            printf("\n");
-            printf("Type -h for help.\n");
+            infoInfo();
         } else if ((strcmp(argv[1], "-h") == 0) ||
                    (strcmp(argv[1], "--help") == 0)) {
-            printf("Help:\n");
-            printf("--help / -h: This command\n");
-            printf("--info / -i: Information about Motion\n");
-            printf(
-                "--run / -r:  Run a file. The final argument is the path to "
-                "the "
-                "file you wish to execute\n");
-
+            helpInfo();
         } else if ((strcmp(argv[1], "--run")) || (strcmp(argv[1], "-r")) == 0) {
+            if ((strcmp(argv[3], "--strict")) || (strcmp(argv[3], "-s")) == 0) {
+                FLAG_STRICT = true;
+            }
+            
             runSource(argv[2]);
-        } else if ((strcmp(argv[3], "--strict")) || (strcmp(argv[3], "-s")) == 0) {
-            FLAG_STRICT = true;
         } else {
             fprintf(stderr, ANSI_COLOR_RED "[MOTION] Invalid Command\n");
             printf(ANSI_COLOR_RESET);
         }
     }
-        
-
 
     freeVM();
     return 0;

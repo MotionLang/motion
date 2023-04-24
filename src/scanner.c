@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "/workspaces/motion/src/include/common.h"
-#include "/workspaces/motion/src/include/flags.h"
 
 
 typedef struct {
