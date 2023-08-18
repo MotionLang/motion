@@ -1,5 +1,5 @@
 ## This
-print foo(bar(baz()));
+print foo(bar(baz("asdf")));
 
-## is equivelent to this
-print baz() >> bar >> foo;
+## is equivalent to this
+print baz("asdf") >> bar() >> foo();
