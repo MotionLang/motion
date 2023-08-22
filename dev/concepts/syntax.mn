@@ -1,0 +1,51 @@
+-- Comments are cool
+
+~~
+Block comments. 
+
+Special Variables start with "&", such as &result, &error, &out, &in, 
+which describe the last function return, the last error, the last 
+thing to stdout, and the last thing to stdin.
+
+Macros start with "@", like @out, @in, @panic, @throw, @quit, which
+print to stdout, get from stdin, calls to panic, throws an error, and quit, respectively.
+@import precompiles the file/directory listed.
+~~
+
+@import base;
+@import "path/to/file.mn";
+@import "path/to/directory";
+
+@out "Hello World!"; -- print to console
+
+fn swapNumbers <a, b>:
+    check:
+        %num <a>; -- checks if local param <a> is num type
+        %num <b>;
+    catch &error == %typeError:
+        @out "Input Values were not numbers!";
+        @panic;
+    end;
+
+    valid:
+      let temp: <a>;
+      <a> = <b>;
+      <b> = temp;
+    end;
+    
+    result:
+      <a>;
+      <b>;
+    end;
+end;
+
+let %arr types: 
+  "%num",
+  "%int",
+  "%flt",
+  "%str",
+  "%arr",
+  "%bool",
+  "%nil"
+  ;
+
