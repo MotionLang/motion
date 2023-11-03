@@ -5,7 +5,7 @@ PROJECT:
   IS_LOADED: false
 ON:
   RUN:
-  - echo hello world
+  - make
 DEPENDANCIES:
   TOOLS:
 
