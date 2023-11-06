@@ -5,6 +5,7 @@ PROJECT:
   IS_LOADED: false
 ON:
   RUN:
+  - echo asdf
   - make
 DEPENDANCIES:
   TOOLS:
