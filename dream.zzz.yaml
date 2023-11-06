@@ -1,6 +1,6 @@
 PROJECT:
   NAME: motion
-  PACKAGE: motion
+  PACKAGE: bin/motion
   DESCRIPTION: "Motion is a clean, dynamically typed programming language."
   VERSION: 1.0.0
   IS_LOADED: false
