@@ -9,6 +9,3 @@ ON:
   - echo asdf
 DEPENDANCIES:
   TOOLS:
-  - NAME: motion
-    LINK: https://github.com/MotionLang/motion.git
-    METHOD: GIT
