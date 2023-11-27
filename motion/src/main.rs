@@ -4,11 +4,17 @@ use debug::disassemble_chunk;
 mod chunk;
 mod debug;
 mod memory;
+mod value;
+
 
 fn main() {
-    let mut chunk: Chunk = Chunk { count: 0, capacity: 0, code: vec![] };
-    chunk.init_chunk();
-    chunk.write_chunk(OpReturn);
+    let mut chunk: Chunk = Chunk::new();
+
+    let constant = chunk.add_constant(value::Value { value: 1.2 });
+    chunk.write(OpConstant as u8, 123);
+    chunk.write(constant, 123);
+
+    chunk.write(OpReturn as u8, 123);
     disassemble_chunk(&chunk, "test chunk");
-    chunk.free_chunk();
+    chunk.free();
 }
