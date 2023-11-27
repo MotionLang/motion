@@ -1,13 +1,20 @@
 use crate::memory::*;
 
+#[derive(Clone, Copy)]
 pub enum OpCode {
     OpReturn,
 }
 
+impl Default for OpCode {
+    fn default() -> Self {
+        OpCode::OpReturn
+    }
+}
+
 pub  struct Chunk {
-    count:  usize,
-    capacity: usize,
-    code: Vec<u8>,
+    pub count:  usize,
+    pub capacity: usize,
+    pub code: Vec<OpCode>,
 }
 
 impl Chunk {
@@ -17,11 +24,11 @@ impl Chunk {
         self.code = vec![];
     }
 
-    pub fn write_chunk(&mut self, byte: u8) {
+    pub fn write_chunk(&mut self, byte: OpCode) {
         if self.capacity < (self.count + 1) {
             let old_capacity: usize = self.capacity;
             self.capacity = grow_capacity(old_capacity);
-            self.code = grow_array::<u8>(&self.code, old_capacity as usize, self.capacity);
+            self.code = grow_array::<OpCode>(&self.code, old_capacity as usize, self.capacity);
         }
 
         self.code[self.count as usize] = byte;
