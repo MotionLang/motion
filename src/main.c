@@ -107,8 +107,6 @@ int main(int argc, const char* argv[]) {
             printf(ANSI_COLOR_RESET);
         }
     }
-        
-
 
     freeVM();
     return 0;
