@@ -9,6 +9,6 @@ ON:
   - echo asdf
 DEPENDANCIES:
   TOOLS:
-    - NAME: gcc
-      LINK: https://github.com/gcc-mirror/gcc.git
+    - NAME: knockout
+      LINK: https://github.com/UPWRD1/knockout.git
       METHOD: GIT
