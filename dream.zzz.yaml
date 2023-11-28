@@ -9,3 +9,6 @@ ON:
   - echo asdf
 DEPENDANCIES:
   TOOLS:
+    - NAME: gcc
+      LINK: https://github.com/gcc-mirror/gcc.git
+      METHOD: GIT
