@@ -7,13 +7,11 @@
 #include "/workspaces/motion/src/include/common.h"
 #include "/workspaces/motion/src/include/flags.h"
 
-
 typedef struct {
     const char* start;
     const char* current;
     int line;
 } Scanner;
-
 
 Scanner scanner;
 
@@ -83,9 +81,9 @@ static void skipWhitespace() {
                 advance();
                 break;
 
-            // Comments; they look like ##
-            case '#':
-                if (peekNext() == '#') {
+            // Comments; they look like --
+            case '-':
+                if (peekNext() == '-') {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
@@ -119,6 +117,8 @@ static TokenType identifierType() {
                 switch (scanner.start[1]) {
                     case 'l':
                         return checkKeyword(2, 2, "se", TOKEN_ELSE);
+                    case 'n':
+                        return checkKeyword(2, 1, "d", TOKEN_CLOSE_BLOCK);
                 }
             }
         case 'f':
@@ -128,17 +128,28 @@ static TokenType identifierType() {
                         return checkKeyword(2, 3, "lse", TOKEN_FALSE);
                     case 'o':
                         return checkKeyword(2, 1, "r", TOKEN_FOR);
-                    case 'u':
-                        return checkKeyword(2, 2, "nc", TOKEN_FUNC);
                 }
             }
             break;
         case 'i':
-            return checkKeyword(1, 1, "f", TOKEN_IF);
+            switch (scanner.start[1]) {
+                case 'f':
+                    return TOKEN_IF;
+                case 's':
+                    return TOKEN_IS;
+            }
+
         case 'n':
             return checkKeyword(1, 2, "il", TOKEN_NIL);
         case 'o':
-            return checkKeyword(1, 1, "r", TOKEN_OR);
+            if (scanner.current - scanner.start > 1) {
+                switch (scanner.start[1]) {
+                    case 'r':
+                        return TOKEN_OR;
+                    case 'p':
+                        return TOKEN_OPERATION;
+                }
+            }
         case 'p':
             return checkKeyword(1, 4, "rint", TOKEN_PRINT);
         case 'r':
@@ -163,7 +174,7 @@ static TokenType identifierType() {
         case 'u':
             return checkKeyword(1, 2, "se", TOKEN_USE);
         case 'v':
-            return checkKeyword(1, 2, "ar", TOKEN_VAR);
+            return checkKeyword(1, 2, "al", TOKEN_VAL);
         case 'w':
             return checkKeyword(1, 4, "hile", TOKEN_WHILE);
     }
@@ -218,7 +229,7 @@ Token scanToken() {
             return makeToken(TOKEN_LEFT_PAREN);
         case ')':
             return makeToken(TOKEN_RIGHT_PAREN);
-        case '{':
+        case ':':
             return makeToken(TOKEN_OPEN_BLOCK);
         case '}':
             return makeToken(TOKEN_CLOSE_BLOCK);
@@ -232,7 +243,7 @@ Token scanToken() {
         case '.':
             return makeToken(TOKEN_DOT);
         case '-':
-            return makeToken(TOKEN_MINUS);
+            return makeToken(match('>') ? TOKEN_ASSIGN : TOKEN_MINUS);
         case '+':
             return makeToken(TOKEN_PLUS);
         case '/':
@@ -242,9 +253,7 @@ Token scanToken() {
         case '!':
             return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=':
-            return makeToken(match('=')
-                                 ? TOKEN_EQUAL_EQUAL
-                                 : (match('>') ? TOKEN_EQUAL : TOKEN_EQUAL));
+            return makeToken(TOKEN_EQUALITY);
         case '<':
             return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>':

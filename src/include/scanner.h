@@ -20,8 +20,8 @@ typedef enum {
     // One or two char tokens
     TOKEN_BANG,
     TOKEN_BANG_EQUAL,
-    TOKEN_EQUAL,
-    TOKEN_EQUAL_EQUAL,
+    TOKEN_ASSIGN,
+    TOKEN_EQUALITY,
     TOKEN_GREATER,
     TOKEN_GREATER_EQUAL,
     TOKEN_LESS,
@@ -36,8 +36,9 @@ typedef enum {
     TOKEN_ELSE,
     TOKEN_FALSE,
     TOKEN_FOR,
-    TOKEN_FUNC,
+    TOKEN_OPERATION,
     TOKEN_IF,
+    TOKEN_IS,
     TOKEN_NIL,
     TOKEN_OR,
     TOKEN_PRINT,
@@ -46,7 +47,7 @@ typedef enum {
     TOKEN_THIS,
     TOKEN_TRUE,
     TOKEN_USE,
-    TOKEN_VAR,
+    TOKEN_VAL,
     TOKEN_WHILE,
 
     // Misc
@@ -55,7 +56,7 @@ typedef enum {
     TOKEN_EOF
 } TokenType;
 
-typedef struct{
+typedef struct {
     int number;
     char* contents;
 } Line;

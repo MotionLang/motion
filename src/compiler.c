@@ -25,7 +25,7 @@ typedef struct {
     bool panicMode;
 } Parser;
 
-/// @brief Enumeratioand uses specific diction to explain their story.n of all
+/// @brief Enumeration uses specific diction to explain their story.n of all
 /// possible precedences.
 typedef enum {
     PREC_NONE,
@@ -104,8 +104,8 @@ static Chunk* currentChunk() { return &current->function->chunk; }
 static void errorAt(Token* token, const char* message) {
     if (parser.panicMode) return;
     parser.panicMode = true;
-    fprintf(stderr, ANSI_COLOR_RED "[line %d] [ERROR]    Error",
-            ((token->line)));
+    fprintf(stderr, ANSI_COLOR_RED "[!] %d:%d Error", ((token->line) - 1),
+            ((token->length)));
 
     if (token->type == TOKEN_EOF) {
         fprintf(stderr, ANSI_COLOR_RED " at end");
@@ -119,7 +119,7 @@ static void errorAt(Token* token, const char* message) {
     fprintf(stderr, ANSI_COLOR_RED ": %s\n", message);
     parser.hadError = true;
     printf(ANSI_COLOR_RESET);
-    /* FIXME: This code should display a "snippet" of the erroneous code.
+    /* TODO: This code should display a "snippet" of the erroneous code.
     However, it doesn't work. The contents of the parser are unpredictable, I
     don't know what to do. Comment out for now.
 
@@ -147,8 +147,8 @@ static void warnAt(Token* token, const char* message) {
     if (FLAG_STRICT == false) {
         if (parser.panicMode) return;
         // parser.panicMode = true;
-        fprintf(stderr, ANSI_COLOR_YELLOW "[line %d] [WARN]    Warning",
-                ((token->line)));
+        fprintf(stderr, ANSI_COLOR_YELLOW "[W] %d:%d Warning",
+                ((token->line) - 1), ((token->length)));
 
         if (token->type == TOKEN_EOF) {
             fprintf(stderr, ANSI_COLOR_YELLOW " at end");
@@ -559,7 +559,7 @@ static void binary(bool canAssign) {
         case TOKEN_BANG_EQUAL:
             emitBytes(OP_EQUAL, OP_NOT);
             break;
-        case TOKEN_EQUAL_EQUAL:
+        case TOKEN_EQUALITY:
             emitByte(OP_EQUAL);
             break;
         case TOKEN_GREATER:
@@ -600,7 +600,7 @@ static void dot(bool canAssign) {
     consume(TOKEN_IDENTIFIER, "Expected property name after '.'");
     uint8_t name = identifierConstant(&parser.previous);
 
-    if (canAssign && match(TOKEN_EQUAL)) {
+    if (canAssign && match(TOKEN_ASSIGN)) {
         expression();
         emitBytes(OP_SET_PROPERTY, name);
     } else if (match(TOKEN_LEFT_PAREN)) {
@@ -670,7 +670,7 @@ static void namedVariable(Token name, bool canAssign) {
         setOp = OP_SET_GLOBAL;
     }
 
-    if (canAssign && match(TOKEN_EQUAL)) {
+    if (canAssign && match(TOKEN_ASSIGN)) {
         expression();
         emitBytes(setOp, (uint8_t)arg);
     } else {
@@ -753,8 +753,8 @@ ParseRule rules[] = {
     [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
     [TOKEN_BANG] = {unary, NULL, PREC_NONE},
     [TOKEN_BANG_EQUAL] = {NULL, binary, PREC_EQUALITY},
-    [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
-    [TOKEN_EQUAL_EQUAL] = {NULL, binary, PREC_EQUALITY},
+    [TOKEN_ASSIGN] = {NULL, NULL, PREC_NONE},
+    [TOKEN_EQUALITY] = {NULL, binary, PREC_EQUALITY},
     [TOKEN_GREATER] = {NULL, binary, PREC_COMPARISON},
     [TOKEN_GREATER_EQUAL] = {NULL, binary, PREC_COMPARISON},
     [TOKEN_AT] = {NULL, binary, PREC_COMPARISON},
@@ -768,7 +768,7 @@ ParseRule rules[] = {
     [TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
     [TOKEN_FALSE] = {literal, NULL, PREC_NONE},
     [TOKEN_FOR] = {NULL, NULL, PREC_NONE},
-    [TOKEN_FUNC] = {NULL, NULL, PREC_NONE},
+    [TOKEN_OPERATION] = {NULL, NULL, PREC_NONE},
     [TOKEN_IF] = {NULL, NULL, PREC_NONE},
     [TOKEN_NIL] = {literal, NULL, PREC_NONE},
     [TOKEN_OR] = {NULL, or_, PREC_NONE},
@@ -777,7 +777,7 @@ ParseRule rules[] = {
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
     [TOKEN_THIS] = {this_, NULL, PREC_NONE},
     [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
-    [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
+    [TOKEN_VAL] = {NULL, NULL, PREC_NONE},
     [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
     [TOKEN_NEWLINE] = {NULL, NULL, PREC_NONE},
     [TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
@@ -801,7 +801,7 @@ static void parsePrecedence(Precedence precedence) {
         infixRule(canAssign);
     }
 
-    if (canAssign && match(TOKEN_EQUAL)) {
+    if (canAssign && match(TOKEN_ASSIGN)) {
         error("Invalid assignment target [CE003]");
     }
 }
@@ -835,7 +835,7 @@ static void function(FunctionType type) {
         } while (match(TOKEN_COMMA));
     }
     warnConsume(TOKEN_RIGHT_PAREN, "Expected a ')' after function parameters.");
-    consume(TOKEN_EQUAL, "Expected a '=>' before function body.");
+    consume(TOKEN_ASSIGN, "Expected a '=>' before function body.");
     warnConsume(TOKEN_OPEN_BLOCK, "A '{' is recommended before function body.");
 
     block();
@@ -895,7 +895,7 @@ static void classDeclaration() {
     }
 
     namedVariable(className, false);
-    consume(TOKEN_EQUAL, "Expected a '=>' before class body");
+    consume(TOKEN_ASSIGN, "Expected a '=>' before class body");
     warnConsume(TOKEN_OPEN_BLOCK, "Expected a '{' before class body");
     while (!check(TOKEN_CLOSE_BLOCK) && !check(TOKEN_EOF)) {
         method();
@@ -920,7 +920,7 @@ static void funcDeclaration() {
 static void varDeclaration() {
     uint8_t global = parseVariable("Expected variable name.");
 
-    if (match(TOKEN_EQUAL)) {
+    if (match(TOKEN_ASSIGN)) {
         expression();
     } else {
         emitByte(OP_NIL);
@@ -941,7 +941,7 @@ static void forStatement() {
     consume(TOKEN_LEFT_PAREN, "Expected '(' after 'for')");
     if (match(TOKEN_SEMICOLON)) {
         // No init
-    } else if (match(TOKEN_VAR)) {
+    } else if (match(TOKEN_VAL)) {
         varDeclaration();
     } else {
         expressionStatement();
@@ -1061,8 +1061,8 @@ static void synchronize() {
         if (parser.previous.type == TOKEN_SEMICOLON) return;
         switch (parser.current.type) {
             case TOKEN_CLASS:
-            case TOKEN_FUNC:
-            case TOKEN_VAR:
+            case TOKEN_OPERATION:
+            case TOKEN_VAL:
             case TOKEN_FOR:
             case TOKEN_IF:
             case TOKEN_WHILE:
@@ -1080,9 +1080,9 @@ static void synchronize() {
 static void declaration() {
     if (match(TOKEN_CLASS)) {
         classDeclaration();
-    } else if (match(TOKEN_FUNC)) {
+    } else if (match(TOKEN_OPERATION)) {
         funcDeclaration();
-    } else if (match(TOKEN_VAR)) {
+    } else if (match(TOKEN_VAL)) {
         varDeclaration();
     } else {
         statement();

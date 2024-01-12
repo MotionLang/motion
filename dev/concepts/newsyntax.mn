@@ -1,0 +1,14 @@
+-- comments are cool
+
+val x -> 3;
+val y -> 5;
+
+op myOperation(count) is :
+    for item in 0 to count:
+        out item;
+    end
+end
+
+op add(a, b) is:
+    return a + b;
+end

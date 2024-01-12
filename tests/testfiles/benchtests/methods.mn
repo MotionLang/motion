@@ -1,4 +1,4 @@
-## This benchmark stresses just method invocation.
+-- This benchmark stresses just method invocation.
 
 def Foo => {
   method0() => {}

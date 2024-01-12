@@ -30,4 +30,4 @@ while (sum < 10000000) {
 print sum;
 print clock() - start;
 
-## Origonal: ~2.25 
+-- Origonal: ~2.25 

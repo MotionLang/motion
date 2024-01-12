@@ -44,6 +44,6 @@ print(twenty);
 
 print clock() - start;
 
-## Original time: ~8 seconds..
-## new time: 0.004756
-## FAST!!
+-- Original time: ~8 seconds..
+-- new time: 0.004756
+-- FAST!!

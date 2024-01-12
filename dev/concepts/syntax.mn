@@ -1,51 +1,75 @@
--- Comments are cool
+-- Binary tree implementation
 
-~~
-Block comments. 
+def Tree => {
+  init(item, depth) => {
+    this.item => item;
+    this.depth => depth;
+    if (depth > 0) {
+      var item2 => item + item;
+      depth => depth - 1;
+      this.left => Tree(item2 - 1, depth);
+      this.right => Tree(item2, depth);
+    } else {
+      this.left => nil;
+      this.right => nil;
+    }
+  }
 
-Special Variables start with "&", such as &result, &error, &out, &in, 
-which describe the last function return, the last error, the last 
-thing to stdout, and the last thing to stdin.
+  check() => {
+    if (this.left == nil) {
+      return this.item;
+    }
 
-Macros start with "@", like @out, @in, @panic, @throw, @quit, which
-print to stdout, get from stdin, calls to panic, throws an error, and quit, respectively.
-@import precompiles the file/directory listed.
-~~
+    return this.item + this.left.check() - this.right.check();
+  }
+}
 
-@import base;
-@import "path/to/file.mn";
-@import "path/to/directory";
+var minDepth => 4;
+var maxDepth => 14;
+var stretchDepth => maxDepth + 1;
 
-@out "Hello World!"; -- print to console
+var start => clock();
 
-fn swapNumbers <a, b>:
-    check:
-        %num <a>; -- checks if local param <a> is num type
-        %num <b>;
-    catch &error == %typeError:
-        @out "Input Values were not numbers!";
-        @panic;
-    end;
+print "stretch tree of depth:";
+print stretchDepth;
+print "check:";
+print Tree(0, stretchDepth).check();
 
-    valid:
-      let temp: <a>;
-      <a> = <b>;
-      <b> = temp;
-    end;
-    
-    result:
-      <a>;
-      <b>;
-    end;
-end;
+var longLivedTree => Tree(0, maxDepth);
 
-let %arr types: 
-  "%num",
-  "%int",
-  "%flt",
-  "%str",
-  "%arr",
-  "%bool",
-  "%nil"
-  ;
+-- iterations => 2 ** maxDepth
+var iterations => 1;
+var d => 0;
+while (d < maxDepth) {
+  iterations => iterations * 2;
+  d => d + 1;
+}
 
+var depth => minDepth;
+while (depth < stretchDepth) {
+  var check => 0;
+  var i => 1;
+  while (i <= iterations) {
+    check => check + Tree(i, depth).check() + Tree(-i, depth).check();
+    i => i + 1;
+  }
+
+  print "num trees:";
+  print iterations * 2;
+  print "depth:";
+  print depth;
+  print "check:";
+  print check;
+
+  iterations => iterations / 4;
+  depth => depth + 2;
+}
+
+print "long lived tree of depth:";
+print maxDepth;
+print "check:";
+print longLivedTree.check();
+print "elapsed:";
+print clock() - start;
+
+-- 5.90351
